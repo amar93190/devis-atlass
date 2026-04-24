@@ -1,51 +1,74 @@
-# Diego – Web + Backend
+# Devis Express (V1)
 
-Monorepo pour l’app web Diego (React + Vite) et l’API Node/Express.
+Application web interne de génération de devis.
 
-## Structure
+## Stack
 
-- `web/` : application React (Vite + TypeScript) reproduisant la maquette avec barre latérale, entrée héro, bulles de chat et accordéons IA.
-- `backend/` : API Express TypeScript reliant Firebase et OpenAI.
-
-## Prérequis
-
-- Node.js 18+
-- npm 8+ (gère les workspaces)
+- Next.js (App Router) + TypeScript
+- Tailwind CSS
+- PostgreSQL
+- Prisma ORM
+- Authentification interne (email + mot de passe)
+- Génération PDF côté serveur avec Puppeteer
 
 ## Installation
+
+1. Installer les dépendances
 
 ```bash
 npm install
 ```
 
-### Variables d’environnement
-
-- Copier `web/.env.example` en `web/.env` et définir `VITE_API_URL` (ex: `http://localhost:4000`).
-- Copier `backend/.env.example` en `backend/.env` avec les clés OpenAI et Firebase Admin.
-
-## Démarrage
-
-Backend :
-```bash
-npm run dev --workspace backend
-```
-
-Frontend :
-```bash
-npm run dev --workspace web
-```
-
-Accède ensuite à http://localhost:5173.
-
-## Tests & lint
+2. Configurer les variables d'environnement
 
 ```bash
-npm run lint --workspace web
-npm run lint --workspace backend
-npm run test --workspace backend
+cp .env.example .env
 ```
 
-## Prochaines étapes
+3. Générer le client Prisma
 
-- Relier le front aux endpoints réels (auth Firebase, plan IA, quotas).
-- Implémenter l’upload média via Firebase Storage.
+```bash
+npm run prisma:generate
+```
+
+4. Créer la base de données et appliquer la migration
+
+```bash
+npm run prisma:migrate -- --name init
+```
+
+5. Injecter les données de démonstration
+
+```bash
+npm run db:seed
+```
+
+6. Lancer le serveur local
+
+```bash
+npm run dev
+```
+
+## Connexion de démonstration
+
+- Email: `admin@devis.local`
+- Mot de passe: `admin123`
+
+## Export PDF
+
+1. Ouvrir un devis via `/quotes/[id]`
+2. Cliquer sur `Télécharger PDF`
+3. Ou appeler directement `/api/quotes/{id}/pdf`
+
+## Scripts utiles
+
+- `npm run dev` : serveur de développement
+- `npm run build` : build de production
+- `npm run start` : exécution production
+- `npm run lint` : lint du projet
+- `npm run prisma:generate` : génération du client Prisma
+- `npm run prisma:migrate -- --name init` : migration locale
+- `npm run prisma:push` : sync schéma sans migration
+- `npm run db:seed` : données de démonstration
+# atlass
+# atlass
