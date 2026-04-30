@@ -104,11 +104,6 @@ function buildHtml(quote: PdfQuote) {
             color: #111827;
             margin-bottom: 8px;
           }
-          .company-name {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 4px;
-          }
           .company-line {
             color: #374151;
             line-height: 1.35;
@@ -128,9 +123,6 @@ function buildHtml(quote: PdfQuote) {
             line-height: 1.4;
           }
           .meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
             margin-bottom: 14px;
           }
           .card {
@@ -149,6 +141,22 @@ function buildHtml(quote: PdfQuote) {
             width: 100%;
             border-collapse: collapse;
             margin-top: 14px;
+          }
+          .client-table {
+            width: 62%;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 11px;
+          }
+          .client-table th {
+            width: 130px;
+            background: #f8fafc;
+            font-size: 10px;
+            padding: 6px;
+          }
+          .client-table td {
+            font-size: 11px;
+            padding: 6px;
           }
           th, td {
             border: 1px solid #cfd6df;
@@ -185,12 +193,6 @@ function buildHtml(quote: PdfQuote) {
             font-size: 14px;
             border-bottom: 2px solid #0f172a;
           }
-          .delays {
-            margin-top: 16px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-          }
           .description {
             margin-top: 2px;
             color: #111827;
@@ -210,7 +212,6 @@ function buildHtml(quote: PdfQuote) {
         <div class="header-top">
           <div class="company">
             ${logoMarkup}
-            <div class="company-name">ATLAS SIGN LED &amp; LIGHTING</div>
             <div class="company-line">19 Bis Avenue Aristide Briand</div>
             <div class="company-line">93190 LIVRY GARGAN</div>
             <div class="company-line">Tél: 01 43 02 00 96</div>
@@ -226,28 +227,24 @@ function buildHtml(quote: PdfQuote) {
           </div>
         </div>
 
-        <div class="meta-grid">
-          <div class="card">
-            <div class="title">Informations client</div>
-            <div><strong>${escapeHtml(quote.client.companyName)}</strong></div>
-            <div>${escapeHtml(quote.client.contactName)}</div>
-            <div>${escapeHtml(quote.client.email)} - ${escapeHtml(quote.client.phone)}</div>
-            <div>${escapeHtml(quote.client.address)}</div>
-          </div>
-
-          <div class="card">
-            <div class="title">Informations devis</div>
-            <div><strong>Date d'émission:</strong> ${formatDate(quote.date)}</div>
-            <div><strong>Référence:</strong> ${escapeHtml(quote.reference)}</div>
-            <div><strong>Objet:</strong> ${escapeHtml(quote.description)}</div>
-            <div><strong>Contact interne:</strong> Équipe commerciale</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="title">Description générale</div>
-          <div class="description">${escapeHtml(quote.description)}</div>
-        </div>
+        <table class="client-table">
+          <tr>
+            <th>Client</th>
+            <td><strong>${escapeHtml(quote.client.companyName)}</strong></td>
+          </tr>
+          <tr>
+            <th>Contact</th>
+            <td>${escapeHtml(quote.client.contactName)}</td>
+          </tr>
+          <tr>
+            <th>Email / Téléphone</th>
+            <td>${escapeHtml(quote.client.email)} - ${escapeHtml(quote.client.phone)}</td>
+          </tr>
+          <tr>
+            <th>Adresse</th>
+            <td>${escapeHtml(quote.client.address)}</td>
+          </tr>
+        </table>
 
         <table>
           <thead>
@@ -270,15 +267,16 @@ function buildHtml(quote: PdfQuote) {
           <div class="totals-row total"><span>Total HT</span><span>${formatCurrency(quote.totalHT)}</span></div>
         </div>
 
-        <div class="card" style="margin-top: 14px;">
-          <div class="title">Délais et conditions de règlement</div>
-          <div class="description">Délai: 2 à 3 semaines après validation du BAT.</div>
-          <div class="description">Les délais seront communiqués à l'envoi de la facture.</div>
-          <div class="description">Conditions de règlement: acompte de 50% à la commande, solde à la livraison.</div>
+        <div style="margin-top: 14px;">
+          <div class="description">Toutes nos enseignes sont fournis avec plan de pose à l'échelle1, fixations tiges filetées ( ou autre à définir ) , et alimentations 12v Meanwell IP67</div>
+          <div class="description">Délai sous 2 à 3 semaines après validation du BAT.</div>
+          <div class="description">Conditions de règlements Acompte de 50% pour validation solde à la livraison</div>
+          <div class="description">Les frais de port indiqués sur ce devis sont donnés à titre indicatif et peuvent évoluer selon les tarifs appliqués par DHL ou autres au moment de l’expédition indépendamment de notre volonté.</div>
+          <div class="description">(délai de livraison estimé est de 3 à 7 jours ouvrables )</div>
         </div>
 
         <div class="footer">
-          Document interne généré automatiquement. Les prix sont exprimés en euros HT. Validité du devis: 30 jours.
+          Siret : 85242494400019 - RCS : IBAN FR46 3000 2011 3600 0007 1490 B34 - N° TVA intracom : FR18852424944
         </div>
       </body>
     </html>
