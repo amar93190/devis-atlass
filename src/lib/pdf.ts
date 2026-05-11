@@ -62,7 +62,7 @@ function splitClientAddress(address: string) {
 
   return {
     line2: match[1].trim(),
-    line3: match[2].trim(),
+    line3: match[2].trim().toUpperCase(),
   };
 }
 
@@ -116,9 +116,12 @@ function buildHtml(quote: PdfQuote) {
             justify-content: space-between;
             align-items: flex-start;
             gap: 20px;
-            border-bottom: 2px solid #e5e7eb;
             padding-bottom: 12px;
+          }
+          .content-separator {
+            margin-top: 68px;
             margin-bottom: 12px;
+            border-top: 2px solid #e5e7eb;
           }
           .company {
             max-width: 62%;
@@ -306,7 +309,7 @@ function buildHtml(quote: PdfQuote) {
             <div class="company-line">19 Bis Avenue Aristide Briand</div>
             <div class="company-line">93190 LIVRY GARGAN</div>
             <div class="company-line">Tél: 01 43 02 00 96</div>
-            <div class="company-line">Tél portable: 07 66 22 11 21</div>
+            <div class="company-line">Tél: 07 66 22 11 21</div>
             <div class="company-line">Site web: www.atlassign.fr</div>
             <div class="company-line">Email: contact@atlassign.fr</div>
           </div>
@@ -321,6 +324,8 @@ function buildHtml(quote: PdfQuote) {
             </div>
           </div>
         </div>
+
+        <div class="content-separator"></div>
 
         <div class="quote-meta-box">
           <div class="title">Informations devis</div>
