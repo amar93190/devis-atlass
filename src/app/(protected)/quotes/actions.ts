@@ -10,7 +10,7 @@ import { toNumber } from "@/lib/utils";
 
 const DEFAULT_PRODUCTION_DELAY = "2 à 3 semaines après validation du BAT.";
 const DEFAULT_TRANSPORT_DELAY = "Les délais seront communiqués à l'envoi de la facture.";
-const DEFAULT_PAYMENT_METHOD = "A reception de facture";
+const DEFAULT_PAYMENT_METHOD = "A réception de facture";
 const LEGACY_PAYMENT_TERMS_PREFIX = "Conditions de règlement:";
 
 const VALID_STATUSES = new Set(Object.values(QuoteStatus));
@@ -36,6 +36,9 @@ function getDate(dateRaw: string) {
 function normalizePaymentMethod(value: string) {
   const cleaned = value.trim();
   if (!cleaned || cleaned.startsWith(LEGACY_PAYMENT_TERMS_PREFIX)) {
+    return DEFAULT_PAYMENT_METHOD;
+  }
+  if (cleaned === "A reception de facture") {
     return DEFAULT_PAYMENT_METHOD;
   }
   return cleaned;

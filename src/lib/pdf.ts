@@ -69,7 +69,10 @@ function splitClientAddress(address: string) {
 function getPaymentMethod(notes: string | null) {
   const value = notes?.trim() || "";
   if (!value || value.startsWith("Conditions de règlement:")) {
-    return "A reception de facture";
+    return "A réception de facture";
+  }
+  if (value === "A reception de facture") {
+    return "A réception de facture";
   }
   return value;
 }
@@ -206,7 +209,7 @@ function buildHtml(quote: PdfQuote) {
           .quote-meta-value {
             color: #111827;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 400;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -281,7 +284,7 @@ function buildHtml(quote: PdfQuote) {
             margin: 0 0 8px 0;
             color: #111827;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 400;
           }
           .footer {
             position: fixed;

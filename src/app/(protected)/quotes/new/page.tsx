@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 const QUOTE_PREFIX = "DE";
 const QUOTE_START_NUMBER = 22413;
-const DEFAULT_PAYMENT_METHOD = "A reception de facture";
+const DEFAULT_PAYMENT_METHOD = "A réception de facture";
 
 function buildDefaultQuoteNumber(existingQuoteNumbers: string[]) {
   const maxExisting = existingQuoteNumbers.reduce((max, quoteNumber) => {
