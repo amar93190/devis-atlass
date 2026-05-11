@@ -3,15 +3,20 @@ import { createQuoteAction } from "@/app/(protected)/quotes/actions";
 import { QuoteForm, type QuoteFormInitialData } from "@/components/quote-form";
 import { prisma } from "@/lib/prisma";
 
-function buildDefaultQuoteNumber(lastQuoteNumber: string | null) {
-  if (!lastQuoteNumber) return "DEV-2026-0001";
+const QUOTE_PREFIX = "DE";
+const QUOTE_START_NUMBER = 22413;
+const DEFAULT_PAYMENT_METHOD = "A reception de facture";
 
-  const parts = lastQuoteNumber.match(/^(.*-)(\d+)$/);
-  if (!parts) return `DEV-2026-${Date.now().toString().slice(-4)}`;
+function buildDefaultQuoteNumber(existingQuoteNumbers: string[]) {
+  const maxExisting = existingQuoteNumbers.reduce((max, quoteNumber) => {
+    const match = quoteNumber.match(/^DE(\d+)$/);
+    if (!match) return max;
 
-  const prefix = parts[1];
-  const value = Number(parts[2]) + 1;
-  return `${prefix}${String(value).padStart(parts[2].length, "0")}`;
+    const value = Number(match[1]);
+    return Number.isFinite(value) ? Math.max(max, value) : max;
+  }, QUOTE_START_NUMBER - 1);
+
+  return `${QUOTE_PREFIX}${maxExisting + 1}`;
 }
 
 type NewQuotePageProps = {
@@ -20,20 +25,21 @@ type NewQuotePageProps = {
 
 export default async function NewQuotePage({ searchParams }: NewQuotePageProps) {
   const params = await searchParams;
-  const clients = await prisma.client.findMany({ orderBy: { companyName: "asc" } });
-  const lastQuote = await prisma.quote.findFirst({ orderBy: { createdAt: "desc" } });
+  const [clients, deQuotes] = await Promise.all([
+    prisma.client.findMany({ orderBy: { companyName: "asc" } }),
+    prisma.quote.findMany({
+      where: { quoteNumber: { startsWith: QUOTE_PREFIX } },
+      select: { quoteNumber: true },
+    }),
+  ]);
 
   const initialData: QuoteFormInitialData = {
     clientId: "",
-    quoteNumber: buildDefaultQuoteNumber(lastQuote?.quoteNumber ?? null),
+    quoteNumber: buildDefaultQuoteNumber(deQuotes.map((quote) => quote.quoteNumber)),
     date: new Date().toISOString().slice(0, 10),
-    reference: "",
-    description: "",
+    paymentMethod: DEFAULT_PAYMENT_METHOD,
     items: [{ code: "", description: "", quantity: 1, unitPrice: 0 }],
     transport: 0,
-    productionDelay: "",
-    transportDelay: "",
-    notes: "",
     status: "DRAFT",
   };
 

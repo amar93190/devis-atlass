@@ -17,13 +17,9 @@ export type QuoteFormInitialData = {
   clientId: string;
   quoteNumber: string;
   date: string;
-  reference: string;
-  description: string;
+  paymentMethod: string;
   items: QuoteItemInput[];
   transport: number;
-  productionDelay: string;
-  transportDelay: string;
-  notes: string;
   status: QuoteStatus;
 };
 
@@ -202,25 +198,14 @@ export function QuoteForm({
         </label>
 
         <label className="space-y-1 text-sm">
-          <span className="font-medium text-slate-700">Référence</span>
+          <span className="font-medium text-slate-700">Mode de règlement</span>
           <input
-            name="reference"
-            required
-            defaultValue={initialData.reference}
+            name="paymentMethod"
+            defaultValue={initialData.paymentMethod}
             className="w-full rounded-md border border-slate-300 px-3 py-2"
           />
         </label>
 
-        <label className="space-y-1 text-sm md:col-span-2">
-          <span className="font-medium text-slate-700">Description générale</span>
-          <textarea
-            name="description"
-            required
-            rows={3}
-            defaultValue={initialData.description}
-            className="w-full rounded-md border border-slate-300 px-3 py-2"
-          />
-        </label>
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-5">

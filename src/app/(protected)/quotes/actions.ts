@@ -10,8 +10,8 @@ import { toNumber } from "@/lib/utils";
 
 const DEFAULT_PRODUCTION_DELAY = "2 à 3 semaines après validation du BAT.";
 const DEFAULT_TRANSPORT_DELAY = "Les délais seront communiqués à l'envoi de la facture.";
-const DEFAULT_PAYMENT_TERMS =
-  "Conditions de règlement: acompte de 50% à la commande, solde à la livraison.";
+const DEFAULT_PAYMENT_METHOD = "A reception de facture";
+const LEGACY_PAYMENT_TERMS_PREFIX = "Conditions de règlement:";
 
 const VALID_STATUSES = new Set(Object.values(QuoteStatus));
 
@@ -33,24 +33,37 @@ function getDate(dateRaw: string) {
   return Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
 }
 
+function normalizePaymentMethod(value: string) {
+  const cleaned = value.trim();
+  if (!cleaned || cleaned.startsWith(LEGACY_PAYMENT_TERMS_PREFIX)) {
+    return DEFAULT_PAYMENT_METHOD;
+  }
+  return cleaned;
+}
+
 export async function createQuoteAction(formData: FormData) {
   const user = await requireAuth();
 
   const clientId = getString(formData, "clientId");
   const quoteNumber = getString(formData, "quoteNumber");
   const dateRaw = getString(formData, "date");
+  const paymentMethod = normalizePaymentMethod(getString(formData, "paymentMethod"));
   const reference = getString(formData, "reference") || quoteNumber;
-  const description = getString(formData, "description");
   const status = getStatus(formData);
   const transportRaw = getString(formData, "transport");
 
-  if (!clientId || !quoteNumber || !description) {
+  if (!clientId || !quoteNumber) {
     redirect("/quotes/new?error=invalid-form");
   }
 
   const items = parseItemsFromForm(formData.get("itemsJson"));
   const transport = toNumber(transportRaw || "0");
   const totals = computeQuoteTotals(items, transport);
+  const description =
+    getString(formData, "description") ||
+    totals.items[0]?.description ||
+    reference ||
+    quoteNumber;
 
   if (totals.items.length === 0) {
     redirect("/quotes/new?error=missing-items");
@@ -71,7 +84,7 @@ export async function createQuoteAction(formData: FormData) {
       productionDelay: DEFAULT_PRODUCTION_DELAY,
       transportDelay: DEFAULT_TRANSPORT_DELAY,
       status,
-      notes: DEFAULT_PAYMENT_TERMS,
+      notes: paymentMethod,
       createdById: user.id,
       items: {
         create: totals.items.map((item) => ({
@@ -101,18 +114,23 @@ export async function updateQuoteAction(formData: FormData) {
   const clientId = getString(formData, "clientId");
   const quoteNumber = getString(formData, "quoteNumber");
   const dateRaw = getString(formData, "date");
+  const paymentMethod = normalizePaymentMethod(getString(formData, "paymentMethod"));
   const reference = getString(formData, "reference") || quoteNumber;
-  const description = getString(formData, "description");
   const status = getStatus(formData);
   const transportRaw = getString(formData, "transport");
 
-  if (!clientId || !quoteNumber || !description) {
+  if (!clientId || !quoteNumber) {
     redirect(`/quotes/${id}/edit?error=invalid-form`);
   }
 
   const items = parseItemsFromForm(formData.get("itemsJson"));
   const transport = toNumber(transportRaw || "0");
   const totals = computeQuoteTotals(items, transport);
+  const description =
+    getString(formData, "description") ||
+    totals.items[0]?.description ||
+    reference ||
+    quoteNumber;
 
   if (totals.items.length === 0) {
     redirect(`/quotes/${id}/edit?error=missing-items`);
@@ -134,7 +152,7 @@ export async function updateQuoteAction(formData: FormData) {
       productionDelay: DEFAULT_PRODUCTION_DELAY,
       transportDelay: DEFAULT_TRANSPORT_DELAY,
       status,
-      notes: DEFAULT_PAYMENT_TERMS,
+      notes: paymentMethod,
       items: {
         deleteMany: {},
         create: totals.items.map((item) => ({
@@ -201,7 +219,7 @@ export async function duplicateQuoteAction(formData: FormData) {
       productionDelay: DEFAULT_PRODUCTION_DELAY,
       transportDelay: DEFAULT_TRANSPORT_DELAY,
       status: QuoteStatus.DRAFT,
-      notes: DEFAULT_PAYMENT_TERMS,
+      notes: normalizePaymentMethod(source.notes || ""),
       createdById: user.id,
       items: {
         create: source.items.map((item) => ({

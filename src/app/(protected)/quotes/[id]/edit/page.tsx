@@ -4,6 +4,17 @@ import { updateQuoteAction } from "@/app/(protected)/quotes/actions";
 import { QuoteForm, type QuoteFormInitialData } from "@/components/quote-form";
 import { prisma } from "@/lib/prisma";
 
+const DEFAULT_PAYMENT_METHOD = "A reception de facture";
+const LEGACY_PAYMENT_TERMS_PREFIX = "Conditions de règlement:";
+
+function getPaymentMethod(notes: string | null) {
+  const value = notes?.trim() || "";
+  if (!value || value.startsWith(LEGACY_PAYMENT_TERMS_PREFIX)) {
+    return DEFAULT_PAYMENT_METHOD;
+  }
+  return value;
+}
+
 type EditQuotePageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ error?: string }>;
@@ -28,8 +39,7 @@ export default async function EditQuotePage({ params, searchParams }: EditQuoteP
     clientId: quote.clientId,
     quoteNumber: quote.quoteNumber,
     date: quote.date.toISOString().slice(0, 10),
-    reference: quote.reference,
-    description: quote.description,
+    paymentMethod: getPaymentMethod(quote.notes),
     items: quote.items.map((item) => ({
       code: item.label,
       description: item.description ?? "",
@@ -37,9 +47,6 @@ export default async function EditQuotePage({ params, searchParams }: EditQuoteP
       unitPrice: Number(item.unitPrice),
     })),
     transport: Number(quote.transport),
-    productionDelay: quote.productionDelay,
-    transportDelay: quote.transportDelay,
-    notes: quote.notes ?? "",
     status: quote.status,
   };
 

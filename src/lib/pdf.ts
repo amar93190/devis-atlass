@@ -49,10 +49,37 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#039;");
 }
 
+function splitClientAddress(address: string) {
+  const normalized = address.trim().replace(/\s+/g, " ");
+  const match = normalized.match(/^(.*?)[,\s-]*(\d{5}\s+.+)$/);
+
+  if (!match) {
+    return {
+      line2: normalized,
+      line3: "",
+    };
+  }
+
+  return {
+    line2: match[1].trim(),
+    line3: match[2].trim(),
+  };
+}
+
+function getPaymentMethod(notes: string | null) {
+  const value = notes?.trim() || "";
+  if (!value || value.startsWith("Conditions de règlement:")) {
+    return "A reception de facture";
+  }
+  return value;
+}
+
 function buildHtml(quote: PdfQuote) {
   const logoMarkup = logoDataUri
     ? `<img src="${logoDataUri}" alt="Atlas Sign" class="company-logo" />`
     : `<div class="logo-fallback">ATLAS SIGN</div>`;
+  const clientAddress = splitClientAddress(quote.client.address);
+  const paymentMethod = getPaymentMethod(quote.notes);
 
   const items = quote.items
     .map(
@@ -79,6 +106,7 @@ function buildHtml(quote: PdfQuote) {
             color: #111827;
             margin: 24px;
             font-size: 12px;
+            padding-bottom: 48px;
           }
           .header-top {
             display: flex;
@@ -93,7 +121,7 @@ function buildHtml(quote: PdfQuote) {
             max-width: 62%;
           }
           .company-logo {
-            width: 120px;
+            width: 60px;
             height: auto;
             display: block;
             margin-bottom: 8px;
@@ -111,16 +139,77 @@ function buildHtml(quote: PdfQuote) {
           .document {
             text-align: right;
           }
+          .document-badge {
+            display: inline-block;
+            background: #e5e7eb;
+            border: 1px solid #9ca3af;
+            padding: 6px 18px;
+            margin-bottom: 8px;
+          }
           .document-title {
-            font-size: 34px;
+            font-size: 28px;
             letter-spacing: 1px;
             font-weight: 800;
             color: #0f172a;
+            line-height: 1;
           }
           .document-meta {
             margin-top: 6px;
             color: #374151;
             line-height: 1.4;
+          }
+          .client-window {
+            margin-top: 88px;
+            margin-left: auto;
+            max-width: 320px;
+            padding: 0;
+            text-align: left;
+          }
+          .client-line {
+            line-height: 1.35;
+            color: #111827;
+            margin-bottom: 2px;
+          }
+          .client-line:last-child {
+            margin-bottom: 0;
+          }
+          .quote-meta-box {
+            width: 62%;
+            border: 1px solid #cfd6df;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 12px;
+            text-align: left;
+          }
+          .quote-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.3fr;
+            gap: 0;
+            border: 1px solid #cfd6df;
+          }
+          .quote-meta-cell {
+            border-right: 1px solid #cfd6df;
+            padding: 6px 8px;
+          }
+          .quote-meta-cell:last-child {
+            border-right: 0;
+          }
+          .quote-meta-label {
+            background: #f3f4f6;
+            color: #475569;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 1px solid #cfd6df;
+          }
+          .quote-meta-value {
+            color: #111827;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           .meta-grid {
             margin-bottom: 14px;
@@ -141,22 +230,6 @@ function buildHtml(quote: PdfQuote) {
             width: 100%;
             border-collapse: collapse;
             margin-top: 14px;
-          }
-          .client-table {
-            width: 62%;
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 11px;
-          }
-          .client-table th {
-            width: 130px;
-            background: #f8fafc;
-            font-size: 10px;
-            padding: 6px;
-          }
-          .client-table td {
-            font-size: 11px;
-            padding: 6px;
           }
           th, td {
             border: 1px solid #cfd6df;
@@ -198,13 +271,28 @@ function buildHtml(quote: PdfQuote) {
             color: #111827;
             line-height: 1.4;
             white-space: pre-wrap;
+            font-family: Verdana, Geneva, sans-serif;
+            font-size: 10px;
+            font-weight: 400;
+            padding-left: 12px;
+            text-indent: -12px;
+          }
+          .validity-note {
+            margin: 0 0 8px 0;
+            color: #111827;
+            font-size: 12px;
+            font-weight: 700;
           }
           .footer {
-            margin-top: 28px;
-            padding-top: 10px;
+            position: fixed;
+            left: 16px;
+            right: 16px;
+            bottom: 20px;
+            padding-top: 8px;
             border-top: 1px solid #e5e7eb;
             color: #6b7280;
             font-size: 10px;
+            text-align: center;
           }
         </style>
       </head>
@@ -220,31 +308,29 @@ function buildHtml(quote: PdfQuote) {
             <div class="company-line">Email: contact@atlassign.fr</div>
           </div>
           <div class="document">
-            <div class="document-title">DEVIS</div>
-            <div class="document-meta"><strong>N°:</strong> ${escapeHtml(quote.quoteNumber)}</div>
-            <div class="document-meta"><strong>Date:</strong> ${formatDate(quote.date)}</div>
-            <div class="document-meta"><strong>Réf:</strong> ${escapeHtml(quote.reference)}</div>
+            <div class="document-badge">
+              <div class="document-title">DEVIS</div>
+            </div>
+            <div class="client-window">
+              <div class="client-line"><strong>${escapeHtml(quote.client.companyName)}</strong></div>
+              <div class="client-line">${escapeHtml(clientAddress.line2)}</div>
+              ${clientAddress.line3 ? `<div class="client-line">${escapeHtml(clientAddress.line3)}</div>` : ""}
+            </div>
           </div>
         </div>
 
-        <table class="client-table">
-          <tr>
-            <th>Client</th>
-            <td><strong>${escapeHtml(quote.client.companyName)}</strong></td>
-          </tr>
-          <tr>
-            <th>Contact</th>
-            <td>${escapeHtml(quote.client.contactName)}</td>
-          </tr>
-          <tr>
-            <th>Email / Téléphone</th>
-            <td>${escapeHtml(quote.client.email)} - ${escapeHtml(quote.client.phone)}</td>
-          </tr>
-          <tr>
-            <th>Adresse</th>
-            <td>${escapeHtml(quote.client.address)}</td>
-          </tr>
-        </table>
+        <div class="quote-meta-box">
+          <div class="title">Informations devis</div>
+          <div class="quote-meta-grid">
+            <div class="quote-meta-cell quote-meta-label">N° devis</div>
+            <div class="quote-meta-cell quote-meta-label">Date</div>
+            <div class="quote-meta-cell quote-meta-label">Mode de règlement</div>
+            <div class="quote-meta-cell quote-meta-value">${escapeHtml(quote.quoteNumber)}</div>
+            <div class="quote-meta-cell quote-meta-value">${formatDate(quote.date)}</div>
+            <div class="quote-meta-cell quote-meta-value">${escapeHtml(paymentMethod)}</div>
+          </div>
+        </div>
+        <div class="validity-note">Devis valable : 3 semaines</div>
 
         <table>
           <thead>
@@ -268,11 +354,9 @@ function buildHtml(quote: PdfQuote) {
         </div>
 
         <div style="margin-top: 14px;">
-          <div class="description">Toutes nos enseignes sont fournis avec plan de pose à l'échelle1, fixations tiges filetées ( ou autre à définir ) , et alimentations 12v Meanwell IP67</div>
-          <div class="description">Délai sous 2 à 3 semaines après validation du BAT.</div>
-          <div class="description">Conditions de règlements Acompte de 50% pour validation solde à la livraison</div>
-          <div class="description">Les frais de port indiqués sur ce devis sont donnés à titre indicatif et peuvent évoluer selon les tarifs appliqués par DHL ou autres au moment de l’expédition indépendamment de notre volonté.</div>
-          <div class="description">(délai de livraison estimé est de 3 à 7 jours ouvrables )</div>
+          <div class="description">• Toutes nos enseignes sont fournis avec plan de pose à l'échelle1, fixations tiges filetées ( ou autre à définir ) , et alimentations 12v Meanwell IP67</div>
+          <div class="description">• Délai sous 2 à 3 semaines après validation du BAT.</div>
+          <div class="description">• Conditions de règlements Acompte de 50% pour validation solde à la livraison</div>
         </div>
 
         <div class="footer">
