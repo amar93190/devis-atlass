@@ -362,12 +362,16 @@ export function QuoteForm({
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-            <span className="text-slate-600">Total HT</span>
-            <span className="font-semibold">{formatCurrency(totals.totalHT)}</span>
+            <span className="text-slate-600">Montant prestations</span>
+            <span className="font-semibold">{formatCurrency(totals.subtotalHT)}</span>
           </div>
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
             <span className="text-slate-600">Transport</span>
             <span className="font-semibold">{formatCurrency(transport)}</span>
+          </div>
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+            <span className="text-slate-600">Total HT</span>
+            <span className="font-semibold">{formatCurrency(totals.totalHT)}</span>
           </div>
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
             <span className="text-slate-600">Total TVA</span>
