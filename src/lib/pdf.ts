@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import fs from "node:fs";
 import path from "node:path";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, toMoney } from "@/lib/utils";
 
 type PdfQuote = {
   quoteNumber: string;
@@ -29,6 +29,7 @@ type PdfQuote = {
     total: number;
   }>;
 };
+const VAT_RATE = 0.2;
 
 const logoDataUri = (() => {
   try {
@@ -83,6 +84,8 @@ function buildHtml(quote: PdfQuote) {
     : `<div class="logo-fallback">ATLAS SIGN</div>`;
   const clientAddress = splitClientAddress(quote.client.address);
   const paymentMethod = getPaymentMethod(quote.notes);
+  const totalTVA = toMoney(quote.totalHT * VAT_RATE);
+  const totalTTC = toMoney(quote.totalHT + totalTVA);
 
   const items = quote.items
     .map(
@@ -284,6 +287,9 @@ function buildHtml(quote: PdfQuote) {
             padding-left: 12px;
             text-indent: -12px;
           }
+          .terms-block {
+            margin-top: 34px;
+          }
           .validity-note {
             margin: 0 0 8px 0;
             color: #111827;
@@ -359,12 +365,13 @@ function buildHtml(quote: PdfQuote) {
         </table>
 
         <div class="totals">
-          <div class="totals-row"><span>Sous-total HT</span><span>${formatCurrency(quote.subtotalHT)}</span></div>
+          <div class="totals-row"><span>Total HT</span><span>${formatCurrency(quote.totalHT)}</span></div>
           <div class="totals-row"><span>Transport</span><span>${formatCurrency(quote.transport)}</span></div>
-          <div class="totals-row total"><span>Total HT</span><span>${formatCurrency(quote.totalHT)}</span></div>
+          <div class="totals-row"><span>Total TVA</span><span>${formatCurrency(totalTVA)}</span></div>
+          <div class="totals-row total"><span>Total TTC</span><span>${formatCurrency(totalTTC)}</span></div>
         </div>
 
-        <div style="margin-top: 14px;">
+        <div class="terms-block">
           <div class="description">• Toutes nos enseignes sont fournis avec plan de pose à l'échelle1, fixations tiges filetées ( ou autre à définir ) , et alimentations 12v Meanwell IP67</div>
           <div class="description">• Délai sous 2 à 3 semaines après validation du BAT.</div>
           <div class="description">• Conditions de règlements Acompte de 50% pour validation solde à la livraison</div>

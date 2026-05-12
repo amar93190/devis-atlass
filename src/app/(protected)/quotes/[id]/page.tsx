@@ -8,7 +8,7 @@ import {
 } from "@/app/(protected)/quotes/actions";
 import { StatusBadge } from "@/components/status-badge";
 import { prisma } from "@/lib/prisma";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, toMoney } from "@/lib/utils";
 
 type QuoteDetailsPageProps = {
   params: Promise<{ id: string }>;
@@ -20,6 +20,7 @@ const statusOptions: Array<{ value: QuoteStatus; label: string }> = [
   { value: "VALIDATED", label: "Validé" },
   { value: "CANCELLED", label: "Annulé" },
 ];
+const VAT_RATE = 0.2;
 
 export default async function QuoteDetailsPage({ params }: QuoteDetailsPageProps) {
   const { id } = await params;
@@ -29,6 +30,10 @@ export default async function QuoteDetailsPage({ params }: QuoteDetailsPageProps
   });
 
   if (!quote) notFound();
+
+  const totalHT = Number(quote.totalHT);
+  const totalTVA = toMoney(totalHT * VAT_RATE);
+  const totalTTC = toMoney(totalHT + totalTVA);
 
   return (
     <div className="space-y-4">
@@ -119,23 +124,29 @@ export default async function QuoteDetailsPage({ params }: QuoteDetailsPageProps
         </table>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-4">
         <article className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
-          <p className="text-slate-500">Sous-total HT</p>
+          <p className="text-slate-500">Total HT</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">
-            {formatCurrency(Number(quote.subtotalHT))}
+            {formatCurrency(totalHT)}
           </p>
         </article>
         <article className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
-          <p className="text-slate-500">Transport HT</p>
+          <p className="text-slate-500">Transport</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">
             {formatCurrency(Number(quote.transport))}
           </p>
         </article>
         <article className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
-          <p className="text-slate-500">Total HT</p>
+          <p className="text-slate-500">Total TVA</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">
-            {formatCurrency(Number(quote.totalHT))}
+            {formatCurrency(totalTVA)}
+          </p>
+        </article>
+        <article className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
+          <p className="text-slate-500">Total TTC</p>
+          <p className="mt-1 text-lg font-semibold text-slate-900">
+            {formatCurrency(totalTTC)}
           </p>
         </article>
       </section>

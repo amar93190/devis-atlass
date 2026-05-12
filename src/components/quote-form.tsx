@@ -4,7 +4,7 @@ import { QuoteStatus } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { QUOTE_CODE_PRESETS, getQuoteCodeDescription, isKnownQuoteCode } from "@/lib/quote-presets";
 import { computeQuoteTotals, type QuoteItemInput } from "@/lib/quote";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, toMoney } from "@/lib/utils";
 
 type QuoteFormClient = {
   id: string;
@@ -44,6 +44,7 @@ const statusOptions: Array<{ value: QuoteStatus; label: string }> = [
   { value: "VALIDATED", label: "Validé" },
   { value: "CANCELLED", label: "Annulé" },
 ];
+const VAT_RATE = 0.2;
 
 function createEmptyItem(): QuoteItemDraft {
   return {
@@ -97,6 +98,8 @@ export function QuoteForm({
     () => computeQuoteTotals(inputItems, transport),
     [inputItems, transport],
   );
+  const totalTVA = useMemo(() => toMoney(totals.totalHT * VAT_RATE), [totals.totalHT]);
+  const totalTTC = useMemo(() => toMoney(totals.totalHT + totalTVA), [totals.totalHT, totalTVA]);
 
   function getOptionsForItem(code: string) {
     if (!code || isKnownQuoteCode(code)) {
@@ -359,16 +362,20 @@ export function QuoteForm({
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-            <span className="text-slate-600">Sous-total HT</span>
-            <span className="font-semibold">{formatCurrency(totals.subtotalHT)}</span>
+            <span className="text-slate-600">Total HT</span>
+            <span className="font-semibold">{formatCurrency(totals.totalHT)}</span>
           </div>
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-            <span className="text-slate-600">Transport HT</span>
+            <span className="text-slate-600">Transport</span>
             <span className="font-semibold">{formatCurrency(transport)}</span>
           </div>
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+            <span className="text-slate-600">Total TVA</span>
+            <span className="font-semibold">{formatCurrency(totalTVA)}</span>
+          </div>
           <div className="flex items-center justify-between text-base font-bold">
-            <span>Total HT</span>
-            <span>{formatCurrency(totals.totalHT)}</span>
+            <span>Total TTC</span>
+            <span>{formatCurrency(totalTTC)}</span>
           </div>
         </div>
       </div>
