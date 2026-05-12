@@ -43,6 +43,7 @@ export default async function EditQuotePage({ params, searchParams }: EditQuoteP
     quoteNumber: quote.quoteNumber,
     date: quote.date.toISOString().slice(0, 10),
     paymentMethod: getPaymentMethod(quote.notes),
+    reference: quote.reference,
     items: quote.items.map((item) => ({
       code: item.label,
       description: item.description ?? "",

@@ -180,7 +180,7 @@ function buildHtml(quote: PdfQuote) {
             margin-bottom: 0;
           }
           .quote-meta-box {
-            width: 62%;
+            width: 100%;
             border: 1px solid #cfd6df;
             border-radius: 6px;
             padding: 8px;
@@ -189,7 +189,7 @@ function buildHtml(quote: PdfQuote) {
           }
           .quote-meta-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1.3fr;
+            grid-template-columns: 0.9fr 0.9fr 1.2fr 1.6fr;
             gap: 0;
             border: 1px solid #cfd6df;
           }
@@ -213,9 +213,10 @@ function buildHtml(quote: PdfQuote) {
             color: #111827;
             font-size: 12px;
             font-weight: 400;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            word-break: break-word;
           }
           .meta-grid {
             margin-bottom: 14px;
@@ -333,9 +334,11 @@ function buildHtml(quote: PdfQuote) {
             <div class="quote-meta-cell quote-meta-label">N° devis</div>
             <div class="quote-meta-cell quote-meta-label">Date</div>
             <div class="quote-meta-cell quote-meta-label">Mode de règlement</div>
+            <div class="quote-meta-cell quote-meta-label">Référence</div>
             <div class="quote-meta-cell quote-meta-value">${escapeHtml(quote.quoteNumber)}</div>
             <div class="quote-meta-cell quote-meta-value">${formatDate(quote.date)}</div>
             <div class="quote-meta-cell quote-meta-value">${escapeHtml(paymentMethod)}</div>
+            <div class="quote-meta-cell quote-meta-value">${escapeHtml(quote.reference)}</div>
           </div>
         </div>
         <div class="validity-note">Devis valable : 3 semaines</div>

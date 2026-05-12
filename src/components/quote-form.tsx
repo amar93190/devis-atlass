@@ -18,6 +18,7 @@ export type QuoteFormInitialData = {
   quoteNumber: string;
   date: string;
   paymentMethod: string;
+  reference: string;
   items: QuoteItemInput[];
   transport: number;
   status: QuoteStatus;
@@ -202,6 +203,16 @@ export function QuoteForm({
           <input
             name="paymentMethod"
             defaultValue={initialData.paymentMethod}
+            className="w-full rounded-md border border-slate-300 px-3 py-2"
+          />
+        </label>
+
+        <label className="space-y-1 text-sm md:col-span-2">
+          <span className="font-medium text-slate-700">Référence</span>
+          <input
+            name="reference"
+            required
+            defaultValue={initialData.reference}
             className="w-full rounded-md border border-slate-300 px-3 py-2"
           />
         </label>

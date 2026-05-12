@@ -38,6 +38,7 @@ export default async function NewQuotePage({ searchParams }: NewQuotePageProps) 
     quoteNumber: buildDefaultQuoteNumber(deQuotes.map((quote) => quote.quoteNumber)),
     date: new Date().toISOString().slice(0, 10),
     paymentMethod: DEFAULT_PAYMENT_METHOD,
+    reference: "",
     items: [{ code: "", description: "", quantity: 1, unitPrice: 0 }],
     transport: 0,
     status: "DRAFT",
