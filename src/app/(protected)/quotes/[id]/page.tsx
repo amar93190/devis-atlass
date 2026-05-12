@@ -124,19 +124,7 @@ export default async function QuoteDetailsPage({ params }: QuoteDetailsPageProps
         </table>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-5">
-        <article className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
-          <p className="text-slate-500">Montant prestations</p>
-          <p className="mt-1 text-lg font-semibold text-slate-900">
-            {formatCurrency(Number(quote.subtotalHT))}
-          </p>
-        </article>
-        <article className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
-          <p className="text-slate-500">Transport</p>
-          <p className="mt-1 text-lg font-semibold text-slate-900">
-            {formatCurrency(Number(quote.transport))}
-          </p>
-        </article>
+      <section className="grid gap-4 md:grid-cols-3">
         <article className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
           <p className="text-slate-500">Total HT</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">
@@ -144,7 +132,7 @@ export default async function QuoteDetailsPage({ params }: QuoteDetailsPageProps
           </p>
         </article>
         <article className="rounded-xl border border-slate-200 bg-white p-4 text-sm">
-          <p className="text-slate-500">Total TVA</p>
+          <p className="text-slate-500">TVA 20%</p>
           <p className="mt-1 text-lg font-semibold text-slate-900">
             {formatCurrency(totalTVA)}
           </p>

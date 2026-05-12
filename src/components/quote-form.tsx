@@ -88,12 +88,9 @@ export function QuoteForm({
   const [items, setItems] = useState<QuoteItemDraft[]>(
     initialData.items.length > 0 ? initialData.items.map(toDraftItem) : [createEmptyItem()],
   );
-  const [transportInput, setTransportInput] = useState<string>(
-    initialData.transport > 0 ? String(initialData.transport) : "",
-  );
 
   const inputItems = useMemo(() => toInputItems(items), [items]);
-  const transport = useMemo(() => toNumber(transportInput), [transportInput]);
+  const transport = 0;
   const totals = useMemo(
     () => computeQuoteTotals(inputItems, transport),
     [inputItems, transport],
@@ -324,20 +321,7 @@ export function QuoteForm({
       </div>
 
       <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-5 md:grid-cols-2">
-        <label className="space-y-1 text-sm">
-          <span className="font-medium text-slate-700">Transport HT</span>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            name="transport"
-            value={transportInput}
-            onChange={(event) => setTransportInput(event.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2"
-          />
-        </label>
-
-        <label className="space-y-1 text-sm">
+        <label className="space-y-1 text-sm md:col-span-2">
           <span className="font-medium text-slate-700">Statut</span>
           <select
             name="status"
@@ -362,19 +346,11 @@ export function QuoteForm({
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-            <span className="text-slate-600">Montant prestations</span>
-            <span className="font-semibold">{formatCurrency(totals.subtotalHT)}</span>
-          </div>
-          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-            <span className="text-slate-600">Transport</span>
-            <span className="font-semibold">{formatCurrency(transport)}</span>
-          </div>
-          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
             <span className="text-slate-600">Total HT</span>
             <span className="font-semibold">{formatCurrency(totals.totalHT)}</span>
           </div>
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-            <span className="text-slate-600">Total TVA</span>
+            <span className="text-slate-600">TVA 20%</span>
             <span className="font-semibold">{formatCurrency(totalTVA)}</span>
           </div>
           <div className="flex items-center justify-between text-base font-bold">

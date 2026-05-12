@@ -365,10 +365,8 @@ function buildHtml(quote: PdfQuote) {
         </table>
 
         <div class="totals">
-          <div class="totals-row"><span>Montant prestations</span><span>${formatCurrency(quote.subtotalHT)}</span></div>
-          <div class="totals-row"><span>Transport</span><span>${formatCurrency(quote.transport)}</span></div>
           <div class="totals-row"><span>Total HT</span><span>${formatCurrency(quote.totalHT)}</span></div>
-          <div class="totals-row"><span>Total TVA</span><span>${formatCurrency(totalTVA)}</span></div>
+          <div class="totals-row"><span>TVA 20%</span><span>${formatCurrency(totalTVA)}</span></div>
           <div class="totals-row total"><span>Total TTC</span><span>${formatCurrency(totalTTC)}</span></div>
         </div>
 
