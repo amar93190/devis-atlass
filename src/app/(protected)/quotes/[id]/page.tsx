@@ -59,6 +59,14 @@ export default async function QuoteDetailsPage({ params }: QuoteDetailsPageProps
           >
             Télécharger PDF
           </a>
+          <a
+            href={`/api/quotes/${id}/invoice`}
+            target="_blank"
+            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            rel="noreferrer"
+          >
+            Télécharger la facture
+          </a>
           <Link
             href="/quotes"
             className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"

@@ -22,8 +22,9 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  quotes   Quote[]
-  sessions Session[]
+  quotes     Quote[]
+  sessions   Session[]
+  campaigns  Campaign[]
 }
 
 model Session {
@@ -49,7 +50,8 @@ model Client {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  quotes Quote[]
+  quotes     Quote[]
+  campaignRecipients CampaignRecipient[]
 }
 
 model Quote {
@@ -79,6 +81,38 @@ model Quote {
   @@index([clientId])
   @@index([createdById])
   @@index([status])
+}
+
+enum CampaignRecipientStatus {
+  SENT
+  FAILED
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  subject     String
+  body        String
+  createdById String
+  createdAt   DateTime @default(now())
+
+  createdBy  User                @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  recipients CampaignRecipient[]
+
+  @@index([createdById])
+}
+
+model CampaignRecipient {
+  id         String                  @id @default(cuid())
+  campaignId String
+  clientId   String
+  status     CampaignRecipientStatus
+  sentAt     DateTime                @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  client   Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@index([clientId])
 }
 
 model QuoteItem {

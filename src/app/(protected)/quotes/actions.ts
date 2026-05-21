@@ -58,7 +58,7 @@ export async function createQuoteAction(formData: FormData) {
   }
 
   const items = parseItemsFromForm(formData.get("itemsJson"));
-  const transport = 0;
+  const transport = Number(getString(formData, "transport")) || 0;
   const totals = computeQuoteTotals(items, transport);
   const description =
     getString(formData, "description") ||
@@ -124,7 +124,7 @@ export async function updateQuoteAction(formData: FormData) {
   }
 
   const items = parseItemsFromForm(formData.get("itemsJson"));
-  const transport = 0;
+  const transport = Number(getString(formData, "transport")) || 0;
   const totals = computeQuoteTotals(items, transport);
   const description =
     getString(formData, "description") ||

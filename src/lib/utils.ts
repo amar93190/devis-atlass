@@ -1,3 +1,5 @@
+export const VAT_RATE = 0.2;
+
 export function formatCurrency(value: number): string {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",

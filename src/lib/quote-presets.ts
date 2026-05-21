@@ -25,28 +25,28 @@ export const QUOTE_CODE_PRESETS: QuoteCodePreset[] = [
   },
   {
     code: "LIVRAISON",
-    label: "Ref. / Livraison",
+    label: "Ref. / Transport",
     description:
       "Estimation des frais pour l'emballage et mise en caisse en bois sur mesure et livraison directement à votre atelier.",
   },
   {
     code: "EQUIPEMENT",
-    label: "Ref. / Equipement (vierge)",
+    label: "Ref. / Equipement",
     description: "",
   },
   {
     code: "DIVERS",
-    label: "Ref. / Divers (vierge)",
+    label: "Ref. / Divers",
     description: "",
   },
   {
-    code: "PRO 600 VIERGE 1",
-    label: "Ref. / PRO 600 (vierge 1)",
+    code: "PRO 600-1",
+    label: "Ref. / PRO 600 - 1",
     description: "",
   },
   {
-    code: "PRO 600 VIERGE 2",
-    label: "Ref. / PRO 600 (vierge 2)",
+    code: "PRO 600-2",
+    label: "Ref. / PRO 600 - 2",
     description: "",
   },
 ];

@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import fs from "node:fs";
 import path from "node:path";
-import { formatCurrency, formatDate, toMoney } from "@/lib/utils";
+import { formatCurrency, formatDate, toMoney, VAT_RATE } from "@/lib/utils";
 
 type PdfQuote = {
   quoteNumber: string;
@@ -29,8 +29,6 @@ type PdfQuote = {
     total: number;
   }>;
 };
-const VAT_RATE = 0.2;
-
 const logoDataUri = (() => {
   try {
     const logoPath = path.join(process.cwd(), "public", "logo-atlas-sign.jpg");
@@ -78,7 +76,8 @@ function getPaymentMethod(notes: string | null) {
   return value;
 }
 
-function buildHtml(quote: PdfQuote) {
+function buildHtml(quote: PdfQuote, mode: "quote" | "invoice" = "quote") {
+  const isInvoice = mode === "invoice";
   const logoMarkup = logoDataUri
     ? `<img src="${logoDataUri}" alt="Atlas Sign" class="company-logo" />`
     : `<div class="logo-fallback">ATLAS SIGN</div>`;
@@ -322,7 +321,7 @@ function buildHtml(quote: PdfQuote) {
           </div>
           <div class="document">
             <div class="document-badge">
-              <div class="document-title">DEVIS</div>
+              <div class="document-title">${isInvoice ? "FACTURE" : "DEVIS"}</div>
             </div>
             <div class="client-window">
               <div class="client-line"><strong>${escapeHtml(quote.client.companyName)}</strong></div>
@@ -337,7 +336,7 @@ function buildHtml(quote: PdfQuote) {
         <div class="quote-meta-box">
           <div class="title">Informations devis</div>
           <div class="quote-meta-grid">
-            <div class="quote-meta-cell quote-meta-label">N° devis</div>
+            <div class="quote-meta-cell quote-meta-label">${isInvoice ? "N° facture" : "N° devis"}</div>
             <div class="quote-meta-cell quote-meta-label">Date</div>
             <div class="quote-meta-cell quote-meta-label">Mode de règlement</div>
             <div class="quote-meta-cell quote-meta-label">Référence</div>
@@ -347,7 +346,7 @@ function buildHtml(quote: PdfQuote) {
             <div class="quote-meta-cell quote-meta-value">${escapeHtml(quote.reference)}</div>
           </div>
         </div>
-        <div class="validity-note">Devis valable : 3 semaines</div>
+        ${isInvoice ? "" : '<div class="validity-note">Devis valable : 3 semaines</div>'}
 
         <table>
           <thead>
@@ -370,11 +369,12 @@ function buildHtml(quote: PdfQuote) {
           <div class="totals-row total"><span>Total TTC</span><span>${formatCurrency(totalTTC)}</span></div>
         </div>
 
+        ${isInvoice ? "" : `
         <div class="terms-block">
           <div class="description">• Toutes nos enseignes sont fournis avec plan de pose à l'échelle1, fixations tiges filetées ( ou autre à définir ) , et alimentations 12v Meanwell IP67</div>
           <div class="description">• Délai sous 2 à 3 semaines après validation du BAT.</div>
           <div class="description">• Conditions de règlements Acompte de 50% pour validation solde à la livraison</div>
-        </div>
+        </div>`}
 
         <div class="footer">
           Siret : 85242494400019 - RCS : IBAN FR46 3000 2011 3600 0007 1490 B34 - N° TVA intracom : FR18852424944
@@ -384,7 +384,7 @@ function buildHtml(quote: PdfQuote) {
   `;
 }
 
-export async function generateQuotePdf(quote: PdfQuote): Promise<Buffer> {
+async function renderPdf(html: string): Promise<Buffer> {
   const browser = await puppeteer.launch({
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -392,7 +392,7 @@ export async function generateQuotePdf(quote: PdfQuote): Promise<Buffer> {
 
   try {
     const page = await browser.newPage();
-    await page.setContent(buildHtml(quote), { waitUntil: "networkidle0" });
+    await page.setContent(html, { waitUntil: "networkidle0" });
 
     const pdf = await page.pdf({
       format: "A4",
@@ -409,4 +409,12 @@ export async function generateQuotePdf(quote: PdfQuote): Promise<Buffer> {
   } finally {
     await browser.close();
   }
+}
+
+export async function generateQuotePdf(quote: PdfQuote): Promise<Buffer> {
+  return renderPdf(buildHtml(quote, "quote"));
+}
+
+export async function generateInvoicePdf(quote: PdfQuote): Promise<Buffer> {
+  return renderPdf(buildHtml(quote, "invoice"));
 }

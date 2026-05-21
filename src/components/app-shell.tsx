@@ -4,6 +4,7 @@ const links = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/clients", label: "Clients" },
   { href: "/quotes", label: "Devis" },
+  { href: "/campaigns", label: "Campagnes email" },
 ];
 
 type AppShellProps = {

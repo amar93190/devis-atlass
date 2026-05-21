@@ -4,7 +4,7 @@ import { QuoteStatus } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { QUOTE_CODE_PRESETS, getQuoteCodeDescription, isKnownQuoteCode } from "@/lib/quote-presets";
 import { computeQuoteTotals, type QuoteItemInput } from "@/lib/quote";
-import { formatCurrency, toMoney } from "@/lib/utils";
+import { formatCurrency, toMoney, VAT_RATE } from "@/lib/utils";
 
 type QuoteFormClient = {
   id: string;
@@ -44,8 +44,6 @@ const statusOptions: Array<{ value: QuoteStatus; label: string }> = [
   { value: "VALIDATED", label: "Validé" },
   { value: "CANCELLED", label: "Annulé" },
 ];
-const VAT_RATE = 0.2;
-
 function createEmptyItem(): QuoteItemDraft {
   return {
     code: "",
@@ -90,10 +88,9 @@ export function QuoteForm({
   );
 
   const inputItems = useMemo(() => toInputItems(items), [items]);
-  const transport = 0;
   const totals = useMemo(
-    () => computeQuoteTotals(inputItems, transport),
-    [inputItems, transport],
+    () => computeQuoteTotals(inputItems, initialData.transport),
+    [inputItems, initialData.transport],
   );
   const totalTVA = useMemo(() => toMoney(totals.totalHT * VAT_RATE), [totals.totalHT]);
   const totalTTC = useMemo(() => toMoney(totals.totalHT + totalTVA), [totals.totalHT, totalTVA]);
@@ -158,6 +155,7 @@ export function QuoteForm({
     <form action={action} className="space-y-6">
       {initialData.id && <input type="hidden" name="id" value={initialData.id} />}
       <input type="hidden" name="itemsJson" value={JSON.stringify(inputItems)} />
+      <input type="hidden" name="transport" value={initialData.transport} />
 
       <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-5 md:grid-cols-2">
         <label className="space-y-1 text-sm">
