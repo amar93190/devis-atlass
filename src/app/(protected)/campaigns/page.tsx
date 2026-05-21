@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
+import { deleteCampaignAction } from "@/app/(protected)/campaigns/actions";
 
 export default async function CampaignsPage() {
   await requireAuth();
@@ -40,22 +41,33 @@ export default async function CampaignsPage() {
             return (
               <div key={campaign.id} className="rounded-xl border border-slate-200 bg-white p-5">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
+                  <Link href={`/campaigns/${campaign.id}`} className="flex-1 min-w-0 hover:underline">
                     <p className="font-semibold text-slate-900">{campaign.subject}</p>
                     <p className="mt-1 text-sm text-slate-500">
                       {formatDate(campaign.createdAt)} · par {campaign.createdBy.name}
                     </p>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm shrink-0">
-                    <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-emerald-700 font-medium">
-                      {sent} envoyé{sent > 1 ? "s" : ""}
-                    </span>
-                    {failed > 0 && (
-                      <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-rose-700 font-medium">
-                        {failed} échoué{failed > 1 ? "s" : ""}
+                  </Link>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-emerald-700 font-medium">
+                        {sent} envoyé{sent > 1 ? "s" : ""}
                       </span>
-                    )}
-                    <span className="text-slate-400">{total} destinataire{total > 1 ? "s" : ""}</span>
+                      {failed > 0 && (
+                        <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-rose-700 font-medium">
+                          {failed} échoué{failed > 1 ? "s" : ""}
+                        </span>
+                      )}
+                      <span className="text-slate-400">{total} destinataire{total > 1 ? "s" : ""}</span>
+                    </div>
+                    <form action={deleteCampaignAction}>
+                      <input type="hidden" name="id" value={campaign.id} />
+                      <button
+                        type="submit"
+                        className="rounded-md border border-rose-200 px-2.5 py-1 text-xs font-medium text-rose-700 hover:bg-rose-50"
+                      >
+                        Supprimer
+                      </button>
+                    </form>
                   </div>
                 </div>
                 <p className="mt-3 text-sm text-slate-600 line-clamp-2 whitespace-pre-wrap">

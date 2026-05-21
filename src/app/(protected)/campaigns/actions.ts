@@ -6,6 +6,14 @@ import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getResend, FROM_EMAIL } from "@/lib/resend";
 
+function applyVariables(text: string, client: { contactName: string; companyName: string }): string {
+  const prenom = client.contactName.split(" ")[0];
+  return text
+    .replaceAll("{{prénom}}", prenom)
+    .replaceAll("{{nom}}", client.contactName)
+    .replaceAll("{{entreprise}}", client.companyName);
+}
+
 export async function sendCampaignAction(formData: FormData) {
   const user = await requireAuth();
 
@@ -23,22 +31,21 @@ export async function sendCampaignAction(formData: FormData) {
   });
 
   const campaign = await prisma.campaign.create({
-    data: {
-      subject,
-      body,
-      createdById: user.id,
-    },
+    data: { subject, body, createdById: user.id },
   });
 
   for (const client of clients) {
     let status: "SENT" | "FAILED" = "FAILED";
 
+    const personalizedBody = applyVariables(body, client);
+    const personalizedSubject = applyVariables(subject, client);
+
     try {
       const { data, error } = await getResend().emails.send({
         from: FROM_EMAIL,
         to: client.email,
-        subject,
-        text: body,
+        subject: personalizedSubject,
+        text: personalizedBody,
       });
 
       if (error) {
@@ -53,13 +60,20 @@ export async function sendCampaignAction(formData: FormData) {
     }
 
     await prisma.campaignRecipient.create({
-      data: {
-        campaignId: campaign.id,
-        clientId: client.id,
-        status,
-      },
+      data: { campaignId: campaign.id, clientId: client.id, status },
     });
   }
+
+  revalidatePath("/campaigns");
+  redirect("/campaigns");
+}
+
+export async function deleteCampaignAction(formData: FormData) {
+  await requireAuth();
+  const id = String(formData.get("id") || "");
+  if (!id) redirect("/campaigns?error=missing-id");
+
+  await prisma.campaign.delete({ where: { id } });
 
   revalidatePath("/campaigns");
   redirect("/campaigns");
