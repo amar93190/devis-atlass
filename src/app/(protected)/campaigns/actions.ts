@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { resend, FROM_EMAIL } from "@/lib/resend";
+import { getResend, FROM_EMAIL } from "@/lib/resend";
 
 export async function sendCampaignAction(formData: FormData) {
   const user = await requireAuth();
@@ -34,7 +34,7 @@ export async function sendCampaignAction(formData: FormData) {
     let status: "SENT" | "FAILED" = "FAILED";
 
     try {
-      const { data, error } = await resend.emails.send({
+      const { data, error } = await getResend().emails.send({
         from: FROM_EMAIL,
         to: client.email,
         subject,
