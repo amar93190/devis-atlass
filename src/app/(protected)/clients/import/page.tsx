@@ -31,7 +31,7 @@ export default async function ImportClientsPage({ searchParams }: ImportPageProp
         </p>
       )}
 
-      <form action={importClientsAction} encType="multipart/form-data" className="space-y-4">
+      <form action={importClientsAction} className="space-y-4">
         <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-4">
           <label className="block space-y-1 text-sm">
             <span className="font-medium text-slate-700">Fichier Excel (.xlsx ou .xls)</span>
