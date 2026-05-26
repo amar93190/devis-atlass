@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ClientSource {
+  MANUAL
+  IMPORTED
+}
+
 enum QuoteStatus {
   DRAFT
   SENT
@@ -41,16 +46,17 @@ model Session {
 }
 
 model Client {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   companyName String
   contactName String
-  email       String   @unique
+  email       String       @unique
   phone       String
   address     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  source      ClientSource @default(MANUAL)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
-  quotes     Quote[]
+  quotes             Quote[]
   campaignRecipients CampaignRecipient[]
 }
 

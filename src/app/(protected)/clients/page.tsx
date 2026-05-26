@@ -2,41 +2,64 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 type ClientsPageProps = {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; tab?: string; imported?: string; skipped?: string }>;
 };
 
 export default async function ClientsPage({ searchParams }: ClientsPageProps) {
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
+  const tab = params.tab === "imported" ? "imported" : "manual";
 
   const clients = await prisma.client.findMany({
-    where: query
-      ? {
-          OR: [
-            { companyName: { contains: query, mode: "insensitive" } },
-            { contactName: { contains: query, mode: "insensitive" } },
-            { email: { contains: query, mode: "insensitive" } },
-          ],
-        }
-      : undefined,
+    where: {
+      source: tab === "imported" ? "IMPORTED" : "MANUAL",
+      ...(query
+        ? {
+            OR: [
+              { companyName: { contains: query, mode: "insensitive" } },
+              { contactName: { contains: query, mode: "insensitive" } },
+              { email: { contains: query, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    },
     orderBy: { companyName: "asc" },
   });
+
+  const tabClass = (active: boolean) =>
+    active
+      ? "rounded-md bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white"
+      : "rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100";
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-slate-900">Clients</h2>
-        <Link
-          href="/clients/new"
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700"
-        >
-          Nouveau client
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/clients/import" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+            Importer Excel
+          </Link>
+          <Link href="/clients/new" className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">
+            Nouveau client
+          </Link>
+        </div>
+      </div>
+
+      {params.imported && (
+        <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          {params.imported} contact(s) importé(s){params.skipped && Number(params.skipped) > 0 ? `, ${params.skipped} ignoré(s) (email déjà existant ou données invalides)` : ""}.
+        </p>
+      )}
+
+      <div className="flex items-center gap-2">
+        <Link href="/clients" className={tabClass(tab === "manual")}>Clients</Link>
+        <Link href="/clients?tab=imported" className={tabClass(tab === "imported")}>Contacts importés</Link>
       </div>
 
       <form className="rounded-xl border border-slate-200 bg-white p-4">
+        <input type="hidden" name="tab" value={tab} />
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-slate-700">Recherche client</span>
+          <span className="mb-1 block font-medium text-slate-700">Recherche</span>
           <input
             name="q"
             defaultValue={query}
@@ -53,20 +76,36 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
               <th className="px-4 py-3">Entreprise</th>
               <th className="px-4 py-3">Contact</th>
               <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Téléphone</th>
-              <th className="px-4 py-3">Adresse</th>
+              {tab === "manual" && (
+                <>
+                  <th className="px-4 py-3">Téléphone</th>
+                  <th className="px-4 py-3">Adresse</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
-            {clients.map((client) => (
-              <tr key={client.id} className="border-t border-slate-200">
-                <td className="px-4 py-3 font-medium text-slate-900">{client.companyName}</td>
-                <td className="px-4 py-3 text-slate-700">{client.contactName}</td>
-                <td className="px-4 py-3 text-slate-700">{client.email}</td>
-                <td className="px-4 py-3 text-slate-700">{client.phone}</td>
-                <td className="px-4 py-3 text-slate-700">{client.address}</td>
+            {clients.length === 0 ? (
+              <tr>
+                <td colSpan={tab === "manual" ? 5 : 3} className="px-4 py-8 text-center text-slate-400">
+                  {tab === "imported" ? "Aucun contact importé." : "Aucun client."}
+                </td>
               </tr>
-            ))}
+            ) : (
+              clients.map((client) => (
+                <tr key={client.id} className="border-t border-slate-200">
+                  <td className="px-4 py-3 font-medium text-slate-900">{client.companyName}</td>
+                  <td className="px-4 py-3 text-slate-700">{client.contactName}</td>
+                  <td className="px-4 py-3 text-slate-700">{client.email}</td>
+                  {tab === "manual" && (
+                    <>
+                      <td className="px-4 py-3 text-slate-700">{client.phone}</td>
+                      <td className="px-4 py-3 text-slate-700">{client.address}</td>
+                    </>
+                  )}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>
