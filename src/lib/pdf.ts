@@ -151,11 +151,11 @@ function buildHtml(quote: PdfQuote, mode: "quote" | "invoice" = "quote") {
             display: inline-block;
             background: #e5e7eb;
             border: 1px solid #9ca3af;
-            padding: 6px 18px;
+            padding: 4px 12px;
             margin-bottom: 8px;
           }
           .document-title {
-            font-size: 28px;
+            font-size: 18px;
             letter-spacing: 1px;
             font-weight: 800;
             color: #0f172a;
