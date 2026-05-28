@@ -93,14 +93,24 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
               </tr>
             ) : (
               clients.map((client) => (
-                <tr key={client.id} className="border-t border-slate-200">
-                  <td className="px-4 py-3 font-medium text-slate-900">{client.companyName}</td>
-                  <td className="px-4 py-3 text-slate-700">{client.contactName}</td>
-                  <td className="px-4 py-3 text-slate-700">{client.email}</td>
+                <tr key={client.id} className="border-t border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <td className="px-4 py-3 font-medium text-slate-900">
+                    <Link href={`/clients/${client.id}/edit`} className="block w-full">{client.companyName}</Link>
+                  </td>
+                  <td className="px-4 py-3 text-slate-700">
+                    <Link href={`/clients/${client.id}/edit`} className="block w-full">{client.contactName}</Link>
+                  </td>
+                  <td className="px-4 py-3 text-slate-700">
+                    <Link href={`/clients/${client.id}/edit`} className="block w-full">{client.email}</Link>
+                  </td>
                   {tab === "manual" && (
                     <>
-                      <td className="px-4 py-3 text-slate-700">{client.phone}</td>
-                      <td className="px-4 py-3 text-slate-700">{client.address}</td>
+                      <td className="px-4 py-3 text-slate-700">
+                        <Link href={`/clients/${client.id}/edit`} className="block w-full">{client.phone}</Link>
+                      </td>
+                      <td className="px-4 py-3 text-slate-700">
+                        <Link href={`/clients/${client.id}/edit`} className="block w-full">{client.address}</Link>
+                      </td>
                     </>
                   )}
                 </tr>

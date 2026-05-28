@@ -15,6 +15,30 @@ const clientSchema = z.object({
   address: z.string().min(4),
 });
 
+export async function updateClientAction(formData: FormData) {
+  await requireAuth();
+
+  const id = formData.get("id") as string;
+  if (!id) redirect("/clients");
+
+  const parsed = clientSchema.safeParse({
+    companyName: formData.get("companyName"),
+    contactName: formData.get("contactName"),
+    email: formData.get("email"),
+    phone: formData.get("phone"),
+    address: formData.get("address"),
+  });
+
+  if (!parsed.success) {
+    redirect(`/clients/${id}/edit?error=invalid-client`);
+  }
+
+  await prisma.client.update({ where: { id }, data: parsed.data });
+  revalidatePath("/clients");
+  revalidatePath("/quotes/new");
+  redirect("/clients");
+}
+
 export async function createClientAction(formData: FormData) {
   await requireAuth();
 
