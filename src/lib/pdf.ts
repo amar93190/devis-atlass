@@ -295,6 +295,12 @@ function buildHtml(quote: PdfQuote, mode: "quote" | "invoice" = "quote") {
             font-size: 12px;
             font-weight: 400;
           }
+          .legal-mentions {
+            margin-top: 24px;
+            color: #6b7280;
+            font-size: 9px;
+            line-height: 1.5;
+          }
           .footer {
             position: fixed;
             left: 16px;
@@ -375,6 +381,13 @@ function buildHtml(quote: PdfQuote, mode: "quote" | "invoice" = "quote") {
           <div class="description">• Délai sous 2 à 3 semaines après validation du BAT.</div>
           <div class="description">• Conditions de règlements Acompte de 50% pour validation solde à la livraison</div>
         </div>`}
+
+        ${isInvoice ? `
+        <div class="legal-mentions">
+          Escompte pour règlement anticipé : 0%<br/>
+          En cas de retard de paiement, une pénalité égale à 3 fois le taux d'intérêt légal sera exigible (Décret 2009-138 du 9 février 2009).<br/>
+          Pour les professionnels, une indemnité minimum forfaitaire de 40 euros pour frais de recouvrement sera exigible (Décret 2012-1115 du 9 octobre 2012).
+        </div>` : ""}
 
         <div class="footer">
           Siret : 85242494400019 - RCS : IBAN FR46 3000 2011 3600 0007 1490 B34 - N° TVA intracom : FR18852424944
