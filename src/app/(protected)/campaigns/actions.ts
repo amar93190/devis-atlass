@@ -17,6 +17,36 @@ contact@atlassign.fr
 www.atlassign.fr
 Bureau:+33 1 43 02 00 96`;
 
+const EMAIL_FOOTER_BEFORE_LOGO = `Bonne réception
+
+Votre Contact
+JDAINI.K
+Responsable Commercial
+Ligne direct +33 7 66 22 11 21
+contact@atlassign.fr`;
+
+const EMAIL_FOOTER_AFTER_LOGO = `www.atlassign.fr
+Bureau:+33 1 43 02 00 96`;
+
+const EMAIL_LOGO_URL = "https://i.postimg.cc/QM3K0dt2/logo-ATLAS-SIGN.jpg";
+
+function escapeHtml(text: string): string {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function buildEmailHtml(body: string): string {
+  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#202124;white-space:pre-wrap;">${escapeHtml(body)}
+
+${escapeHtml(EMAIL_FOOTER_BEFORE_LOGO)}</div>
+<img src="${EMAIL_LOGO_URL}" alt="Atlas Sign" width="90" style="display:block;width:90px;height:auto;margin:16px 0 6px;border:0;" />
+<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#202124;white-space:pre-wrap;">${escapeHtml(EMAIL_FOOTER_AFTER_LOGO)}</div>`;
+}
+
 function applyVariables(text: string, client: { contactName: string; companyName: string }): string {
   const prenom = client.contactName.split(" ")[0];
   return text
@@ -51,6 +81,7 @@ export async function sendCampaignAction(formData: FormData) {
     const personalizedBody = applyVariables(body, client);
     const personalizedSubject = applyVariables(subject, client);
     const emailText = `${personalizedBody}\n\n${EMAIL_FOOTER}`;
+    const emailHtml = buildEmailHtml(personalizedBody);
 
     try {
       const { data, error } = await getResend().emails.send({
@@ -58,6 +89,7 @@ export async function sendCampaignAction(formData: FormData) {
         to: client.email,
         subject: personalizedSubject,
         text: emailText,
+        html: emailHtml,
       });
 
       if (error) {
