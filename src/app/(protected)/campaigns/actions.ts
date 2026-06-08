@@ -6,6 +6,17 @@ import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getResend, FROM_EMAIL } from "@/lib/resend";
 
+const EMAIL_FOOTER = `Bonne réception
+
+Votre Contact
+JDAINI.K
+Responsable Commercial
+Ligne direct +33 7 66 22 11 21
+contact@atlassign.fr
+
+www.atlassign.fr
+Bureau:+33 1 43 02 00 96`;
+
 function applyVariables(text: string, client: { contactName: string; companyName: string }): string {
   const prenom = client.contactName.split(" ")[0];
   return text
@@ -39,13 +50,14 @@ export async function sendCampaignAction(formData: FormData) {
 
     const personalizedBody = applyVariables(body, client);
     const personalizedSubject = applyVariables(subject, client);
+    const emailText = `${personalizedBody}\n\n${EMAIL_FOOTER}`;
 
     try {
       const { data, error } = await getResend().emails.send({
         from: FROM_EMAIL,
         to: client.email,
         subject: personalizedSubject,
-        text: personalizedBody,
+        text: emailText,
       });
 
       if (error) {
