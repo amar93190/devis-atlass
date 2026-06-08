@@ -28,7 +28,7 @@ contact@atlassign.fr`;
 const EMAIL_FOOTER_AFTER_LOGO = `www.atlassign.fr
 Bureau:+33 1 43 02 00 96`;
 
-const EMAIL_LOGO_URL = "https://i.postimg.cc/QM3K0dt2/logo-ATLAS-SIGN.jpg";
+const EMAIL_LOGO_URL = "https://i.postimg.cc/QM3K0dt2/logo-ATLAS-SIGN.jpg?v=20260608-1";
 
 function escapeHtml(text: string): string {
   return text
