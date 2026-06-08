@@ -1,8 +1,17 @@
 import Link from "next/link";
+import { deleteClientAction } from "@/app/(protected)/clients/actions";
+import { DeleteClientButton } from "@/components/delete-client-button";
 import { prisma } from "@/lib/prisma";
 
 type ClientsPageProps = {
-  searchParams: Promise<{ q?: string; tab?: string; imported?: string; skipped?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    tab?: string;
+    imported?: string;
+    skipped?: string;
+    deleted?: string;
+    error?: string;
+  }>;
 };
 
 export default async function ClientsPage({ searchParams }: ClientsPageProps) {
@@ -51,6 +60,18 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
         </p>
       )}
 
+      {params.deleted && (
+        <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          Client supprimé.
+        </p>
+      )}
+
+      {params.error === "client-has-quotes" && (
+        <p className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+          Ce client possède des devis et ne peut pas être supprimé.
+        </p>
+      )}
+
       <div className="flex items-center gap-2">
         <Link href="/clients" className={tabClass(tab === "manual")}>Clients</Link>
         <Link href="/clients?tab=imported" className={tabClass(tab === "imported")}>Contacts importés</Link>
@@ -82,12 +103,13 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                   <th className="px-4 py-3">Adresse</th>
                 </>
               )}
+              <th className="px-4 py-3 text-right">Action</th>
             </tr>
           </thead>
           <tbody>
             {clients.length === 0 ? (
               <tr>
-                <td colSpan={tab === "manual" ? 5 : 3} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={tab === "manual" ? 6 : 4} className="px-4 py-8 text-center text-slate-400">
                   {tab === "imported" ? "Aucun contact importé." : "Aucun client."}
                 </td>
               </tr>
@@ -113,6 +135,16 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                       </td>
                     </>
                   )}
+                  <td className="px-4 py-3 text-right">
+                    <form action={deleteClientAction}>
+                      <input type="hidden" name="id" value={client.id} />
+                      <input type="hidden" name="tab" value={tab} />
+                      <DeleteClientButton
+                        companyName={client.companyName}
+                        email={client.email}
+                      />
+                    </form>
+                  </td>
                 </tr>
               ))
             )}

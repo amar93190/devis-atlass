@@ -60,6 +60,29 @@ export async function createClientAction(formData: FormData) {
   redirect("/clients");
 }
 
+export async function deleteClientAction(formData: FormData) {
+  await requireAuth();
+
+  const id = String(formData.get("id") || "");
+  const tab = formData.get("tab") === "imported" ? "imported" : "manual";
+  const clientsPath = tab === "imported" ? "/clients?tab=imported" : "/clients";
+
+  if (!id) redirect(`${clientsPath}${tab === "imported" ? "&" : "?"}error=missing-client`);
+
+  const quoteCount = await prisma.quote.count({ where: { clientId: id } });
+  if (quoteCount > 0) {
+    redirect(`${clientsPath}${tab === "imported" ? "&" : "?"}error=client-has-quotes`);
+  }
+
+  await prisma.client.delete({ where: { id } });
+
+  revalidatePath("/clients");
+  revalidatePath("/campaigns");
+  revalidatePath("/dashboard");
+  revalidatePath("/quotes/new");
+  redirect(`${clientsPath}${tab === "imported" ? "&" : "?"}deleted=1`);
+}
+
 const rowSchema = z.object({
   companyName: z.string().min(1),
   contactName: z.string().min(1),
