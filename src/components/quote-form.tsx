@@ -405,7 +405,7 @@ export function QuoteForm({
           <p className="font-semibold text-slate-900">Conditions automatiques du devis</p>
           <p className="mt-1">Délai: 2 à 3 semaines après validation du BAT.</p>
           <p>Les délais seront communiqués à l&apos;envoi de la facture.</p>
-          <p>Conditions de règlement : acompte de 50% à la commande, solde aux frais de port.</p>
+          <p>Conditions de règlement: acompte de 50% à la commande, solde à la livraison.</p>
         </div>
       </div>
 
