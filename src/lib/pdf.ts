@@ -377,14 +377,14 @@ function buildHtml(quote: PdfQuote, mode: "quote" | "invoice" = "quote") {
           <div class="totals-row"><span>TVA 20%</span><span>${formatCurrency(totalTVA)}</span></div>
           <div class="totals-row total"><span>Total TTC</span><span>${formatCurrency(totalTTC)}</span></div>
           <div class="totals-row" style="margin-top:8px"><span>Acompte</span><span>${formatCurrency(depositAmount)}</span></div>
-          <div class="totals-row"><span>Solde à la livraison</span><span>${formatCurrency(balance)}</span></div>
+          <div class="totals-row"><span>Solde aux frais de port</span><span>${formatCurrency(balance)}</span></div>
         </div>
 
         ${isInvoice ? "" : `
         <div class="terms-block">
           <div class="description">• Toutes nos enseignes sont fournis avec plan de pose à l'échelle1, fixations tiges filetées ( ou autre à définir ) , et alimentations 12v Meanwell IP67</div>
           <div class="description">• Délai sous 2 à 3 semaines après validation du BAT.</div>
-          <div class="description">• Conditions de règlements Acompte de 50% pour validation solde à la livraison</div>
+          <div class="description">• Conditions de règlement : acompte de 50% pour validation, solde aux frais de port</div>
         </div>`}
 
         ${isInvoice ? `
