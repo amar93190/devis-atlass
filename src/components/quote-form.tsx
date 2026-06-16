@@ -1,7 +1,7 @@
 "use client";
 
 import { QuoteStatus } from "@prisma/client";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { QUOTE_CODE_PRESETS, getQuoteCodeDescription, isKnownQuoteCode } from "@/lib/quote-presets";
 import { computeQuoteTotals, type QuoteItemInput } from "@/lib/quote";
 import { formatCurrency, toMoney, VAT_RATE } from "@/lib/utils";
@@ -86,6 +86,8 @@ export function QuoteForm({
   const [items, setItems] = useState<QuoteItemDraft[]>(
     initialData.items.length > 0 ? initialData.items.map(toDraftItem) : [createEmptyItem()],
   );
+  const dragIndexRef = useRef<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const inputItems = useMemo(() => toInputItems(items), [items]);
   const totals = useMemo(
@@ -145,6 +147,36 @@ export function QuoteForm({
 
   function addItem() {
     setItems((prev) => [...prev, createEmptyItem()]);
+  }
+
+  function handleDragStart(index: number) {
+    dragIndexRef.current = index;
+  }
+
+  function handleDragOver(event: React.DragEvent, index: number) {
+    event.preventDefault();
+    setDragOverIndex(index);
+  }
+
+  function handleDrop(index: number) {
+    const from = dragIndexRef.current;
+    if (from === null || from === index) {
+      setDragOverIndex(null);
+      return;
+    }
+    setItems((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(index, 0, moved);
+      return next;
+    });
+    dragIndexRef.current = null;
+    setDragOverIndex(null);
+  }
+
+  function handleDragEnd() {
+    dragIndexRef.current = null;
+    setDragOverIndex(null);
   }
 
   function removeItem(index: number) {
@@ -237,8 +269,35 @@ export function QuoteForm({
             return (
               <div
                 key={`item-${index}`}
-                className="grid gap-3 rounded-lg border border-slate-200 p-3 md:grid-cols-12"
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDrop={() => handleDrop(index)}
+                onDragEnd={handleDragEnd}
+                className={`flex gap-2 rounded-lg border p-3 transition-colors ${
+                  dragOverIndex === index
+                    ? "border-slate-400 bg-slate-50"
+                    : "border-slate-200"
+                }`}
               >
+                <div className="flex shrink-0 items-start pt-6">
+                  <div
+                    className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 select-none"
+                    title="Glisser pour réordonner"
+                  >
+                    <svg width="16" height="20" viewBox="0 0 16 20" fill="currentColor">
+                      <circle cx="5" cy="4" r="1.5" />
+                      <circle cx="11" cy="4" r="1.5" />
+                      <circle cx="5" cy="10" r="1.5" />
+                      <circle cx="11" cy="10" r="1.5" />
+                      <circle cx="5" cy="16" r="1.5" />
+                      <circle cx="11" cy="16" r="1.5" />
+                    </svg>
+                  </div>
+                </div>
+
+                <div className="grid min-w-0 flex-1 gap-3 md:grid-cols-12">
+
                 <label className="md:col-span-3">
                   <span className="mb-1 block text-xs font-medium text-slate-600">Code</span>
                   <select
@@ -311,6 +370,8 @@ export function QuoteForm({
                   >
                     Suppr.
                   </button>
+                </div>
+
                 </div>
               </div>
             );
