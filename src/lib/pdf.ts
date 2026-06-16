@@ -11,6 +11,7 @@ type PdfQuote = {
   transport: number;
   subtotalHT: number;
   totalHT: number;
+  deposit: number;
   productionDelay: string;
   transportDelay: string;
   notes: string | null;
@@ -85,6 +86,9 @@ function buildHtml(quote: PdfQuote, mode: "quote" | "invoice" = "quote") {
   const paymentMethod = getPaymentMethod(quote.notes);
   const totalTVA = toMoney(quote.totalHT * VAT_RATE);
   const totalTTC = toMoney(quote.totalHT + totalTVA);
+  const depositPct = quote.deposit ?? 50;
+  const depositAmount = toMoney(totalTTC * (depositPct / 100));
+  const balance = toMoney(totalTTC - depositAmount);
 
   const items = quote.items
     .map(
@@ -373,6 +377,8 @@ function buildHtml(quote: PdfQuote, mode: "quote" | "invoice" = "quote") {
           <div class="totals-row"><span>Total HT</span><span>${formatCurrency(quote.totalHT)}</span></div>
           <div class="totals-row"><span>TVA 20%</span><span>${formatCurrency(totalTVA)}</span></div>
           <div class="totals-row total"><span>Total TTC</span><span>${formatCurrency(totalTTC)}</span></div>
+          <div class="totals-row" style="margin-top:8px"><span>Acompte ${depositPct}%</span><span>${formatCurrency(depositAmount)}</span></div>
+          <div class="totals-row"><span>Solde à la livraison</span><span>${formatCurrency(balance)}</span></div>
         </div>
 
         ${isInvoice ? "" : `

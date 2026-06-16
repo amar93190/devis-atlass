@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Quote" ADD COLUMN     "deposit" DECIMAL(5,2) NOT NULL DEFAULT 50;

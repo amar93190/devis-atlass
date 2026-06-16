@@ -51,6 +51,7 @@ export default async function EditQuotePage({ params, searchParams }: EditQuoteP
       unitPrice: Number(item.unitPrice),
     })),
     transport: Number(quote.transport),
+    deposit: Number(quote.deposit),
     status: quote.status,
   };
 

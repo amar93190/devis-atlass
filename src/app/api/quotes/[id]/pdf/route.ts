@@ -32,6 +32,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     transport: Number(quote.transport),
     subtotalHT: Number(quote.subtotalHT),
     totalHT: Number(quote.totalHT),
+    deposit: Number(quote.deposit),
     productionDelay: quote.productionDelay,
     transportDelay: quote.transportDelay,
     notes: quote.notes,

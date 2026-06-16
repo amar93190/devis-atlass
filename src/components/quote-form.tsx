@@ -21,6 +21,7 @@ export type QuoteFormInitialData = {
   reference: string;
   items: QuoteItemInput[];
   transport: number;
+  deposit: number;
   status: QuoteStatus;
 };
 
@@ -88,6 +89,7 @@ export function QuoteForm({
   );
   const dragIndexRef = useRef<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [deposit, setDeposit] = useState<number>(initialData.deposit ?? 50);
 
   const inputItems = useMemo(() => toInputItems(items), [items]);
   const totals = useMemo(
@@ -96,6 +98,8 @@ export function QuoteForm({
   );
   const totalTVA = useMemo(() => toMoney(totals.totalHT * VAT_RATE), [totals.totalHT]);
   const totalTTC = useMemo(() => toMoney(totals.totalHT + totalTVA), [totals.totalHT, totalTVA]);
+  const depositAmount = useMemo(() => toMoney(totalTTC * (deposit / 100)), [totalTTC, deposit]);
+  const balance = useMemo(() => toMoney(totalTTC - depositAmount), [totalTTC, depositAmount]);
 
   function getOptionsForItem(code: string) {
     if (!code || isKnownQuoteCode(code)) {
@@ -188,6 +192,7 @@ export function QuoteForm({
       {initialData.id && <input type="hidden" name="id" value={initialData.id} />}
       <input type="hidden" name="itemsJson" value={JSON.stringify(inputItems)} />
       <input type="hidden" name="transport" value={initialData.transport} />
+      <input type="hidden" name="deposit" value={deposit} />
 
       <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-5 md:grid-cols-2">
         <label className="space-y-1 text-sm">
@@ -412,9 +417,31 @@ export function QuoteForm({
             <span className="text-slate-600">TVA 20%</span>
             <span className="font-semibold">{formatCurrency(totalTVA)}</span>
           </div>
-          <div className="flex items-center justify-between text-base font-bold">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2 text-base font-bold">
             <span>Total TTC</span>
             <span>{formatCurrency(totalTTC)}</span>
+          </div>
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2 pt-1">
+            <label className="flex items-center gap-2 text-slate-600">
+              <span>Acompte</span>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={deposit}
+                  onChange={(e) => setDeposit(Math.min(100, Math.max(0, Number(e.target.value))))}
+                  className="w-14 rounded-md border border-slate-300 px-2 py-1 text-sm text-center"
+                />
+                <span className="text-slate-500">%</span>
+              </div>
+            </label>
+            <span className="font-semibold">{formatCurrency(depositAmount)}</span>
+          </div>
+          <div className="flex items-center justify-between text-slate-600">
+            <span>Solde à la livraison</span>
+            <span className="font-semibold">{formatCurrency(balance)}</span>
           </div>
         </div>
       </div>
