@@ -59,7 +59,7 @@ export async function createQuoteAction(formData: FormData) {
 
   const items = parseItemsFromForm(formData.get("itemsJson"));
   const transport = Number(getString(formData, "transport")) || 0;
-  const deposit = Math.min(100, Math.max(0, Number(getString(formData, "deposit")) || 50));
+  const deposit = Math.max(0, Number(getString(formData, "deposit")) || 0);
   const totals = computeQuoteTotals(items, transport);
   const description =
     getString(formData, "description") ||
@@ -127,7 +127,7 @@ export async function updateQuoteAction(formData: FormData) {
 
   const items = parseItemsFromForm(formData.get("itemsJson"));
   const transport = Number(getString(formData, "transport")) || 0;
-  const deposit = Math.min(100, Math.max(0, Number(getString(formData, "deposit")) || 50));
+  const deposit = Math.max(0, Number(getString(formData, "deposit")) || 0);
   const totals = computeQuoteTotals(items, transport);
   const description =
     getString(formData, "description") ||

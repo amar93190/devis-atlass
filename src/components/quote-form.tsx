@@ -89,7 +89,9 @@ export function QuoteForm({
   );
   const dragIndexRef = useRef<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [deposit, setDeposit] = useState<number>(initialData.deposit ?? 50);
+  const [deposit, setDeposit] = useState<string>(
+    initialData.deposit > 0 ? String(initialData.deposit) : "",
+  );
 
   const inputItems = useMemo(() => toInputItems(items), [items]);
   const totals = useMemo(
@@ -98,7 +100,7 @@ export function QuoteForm({
   );
   const totalTVA = useMemo(() => toMoney(totals.totalHT * VAT_RATE), [totals.totalHT]);
   const totalTTC = useMemo(() => toMoney(totals.totalHT + totalTVA), [totals.totalHT, totalTVA]);
-  const depositAmount = useMemo(() => toMoney(totalTTC * (deposit / 100)), [totalTTC, deposit]);
+  const depositAmount = useMemo(() => toMoney(toNumber(deposit)), [deposit]);
   const balance = useMemo(() => toMoney(totalTTC - depositAmount), [totalTTC, depositAmount]);
 
   function getOptionsForItem(code: string) {
@@ -192,7 +194,7 @@ export function QuoteForm({
       {initialData.id && <input type="hidden" name="id" value={initialData.id} />}
       <input type="hidden" name="itemsJson" value={JSON.stringify(inputItems)} />
       <input type="hidden" name="transport" value={initialData.transport} />
-      <input type="hidden" name="deposit" value={deposit} />
+      <input type="hidden" name="deposit" value={toNumber(deposit)} />
 
       <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-5 md:grid-cols-2">
         <label className="space-y-1 text-sm">
@@ -423,19 +425,16 @@ export function QuoteForm({
           </div>
           <div className="flex items-center justify-between border-b border-slate-200 pb-2 pt-1">
             <label className="flex items-center gap-2 text-slate-600">
-              <span>Acompte</span>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="1"
-                  value={deposit}
-                  onChange={(e) => setDeposit(Math.min(100, Math.max(0, Number(e.target.value))))}
-                  className="w-14 rounded-md border border-slate-300 px-2 py-1 text-sm text-center"
-                />
-                <span className="text-slate-500">%</span>
-              </div>
+              <span>Acompte (€)</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={deposit}
+                onChange={(e) => setDeposit(e.target.value)}
+                className="w-28 rounded-md border border-slate-300 px-2 py-1 text-sm text-right"
+                placeholder="0,00"
+              />
             </label>
             <span className="font-semibold">{formatCurrency(depositAmount)}</span>
           </div>

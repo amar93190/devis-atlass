@@ -41,7 +41,7 @@ export default async function NewQuotePage({ searchParams }: NewQuotePageProps) 
     reference: "",
     items: [{ code: "", description: "", quantity: 1, unitPrice: 0 }],
     transport: 0,
-    deposit: 50,
+    deposit: 0,
     status: "DRAFT",
   };
 

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Quote" ALTER COLUMN "deposit" SET DEFAULT 0,
+ALTER COLUMN "deposit" SET DATA TYPE DECIMAL(12,2);
