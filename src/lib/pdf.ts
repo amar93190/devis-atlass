@@ -69,10 +69,10 @@ function splitClientAddress(address: string) {
 function getPaymentMethod(notes: string | null) {
   const value = notes?.trim() || "";
   if (!value || value.startsWith("Conditions de règlement:")) {
-    return "A réception de facture";
+    return "A réception";
   }
-  if (value === "A reception de facture") {
-    return "A réception de facture";
+  if (value === "A reception de facture" || value === "A réception de facture") {
+    return "A réception";
   }
   return value;
 }

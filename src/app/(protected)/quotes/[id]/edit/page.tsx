@@ -4,7 +4,7 @@ import { updateQuoteAction } from "@/app/(protected)/quotes/actions";
 import { QuoteForm, type QuoteFormInitialData } from "@/components/quote-form";
 import { prisma } from "@/lib/prisma";
 
-const DEFAULT_PAYMENT_METHOD = "A réception de facture";
+const DEFAULT_PAYMENT_METHOD = "A réception";
 const LEGACY_PAYMENT_TERMS_PREFIX = "Conditions de règlement:";
 
 function getPaymentMethod(notes: string | null) {
@@ -12,7 +12,7 @@ function getPaymentMethod(notes: string | null) {
   if (!value || value.startsWith(LEGACY_PAYMENT_TERMS_PREFIX)) {
     return DEFAULT_PAYMENT_METHOD;
   }
-  if (value === "A reception de facture") {
+  if (value === "A reception de facture" || value === "A réception de facture") {
     return DEFAULT_PAYMENT_METHOD;
   }
   return value;
