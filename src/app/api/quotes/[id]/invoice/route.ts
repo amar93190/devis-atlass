@@ -15,10 +15,10 @@ export async function GET(_request: NextRequest, context: RouteContext) {
 
   const { id } = await context.params;
 
-  const quote = await prisma.quote.findUnique({
-    where: { id },
-    include: { client: true, items: true },
-  });
+  const [quote, invoice] = await Promise.all([
+    prisma.quote.findUnique({ where: { id }, include: { client: true, items: true } }),
+    prisma.invoice.findUnique({ where: { quoteId: id } }),
+  ]);
 
   if (!quote) {
     return NextResponse.json({ message: "Quote not found" }, { status: 404 });
@@ -26,6 +26,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
 
   const pdfBuffer = await generateInvoicePdf({
     quoteNumber: quote.quoteNumber,
+    invoiceNumber: invoice?.invoiceNumber,
     date: quote.date,
     reference: quote.reference,
     description: quote.description,
@@ -55,7 +56,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
   return new NextResponse(pdfBuffer as BodyInit, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="FACTURE-${quote.quoteNumber}.pdf"`,
+      "Content-Disposition": `attachment; filename="FACTURE-${invoice?.invoiceNumber ?? quote.quoteNumber}.pdf"`,
     },
   });
 }
