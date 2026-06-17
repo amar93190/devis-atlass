@@ -26,7 +26,7 @@ export default async function QuoteDetailsPage({ params }: QuoteDetailsPageProps
   const { id } = await params;
   const quote = await prisma.quote.findUnique({
     where: { id },
-    include: { client: true, items: true, createdBy: true },
+    include: { client: true, items: true, createdBy: true, invoice: true },
   });
 
   if (!quote) notFound();
@@ -59,14 +59,23 @@ export default async function QuoteDetailsPage({ params }: QuoteDetailsPageProps
           >
             Télécharger PDF
           </a>
-          <a
-            href={`/api/quotes/${id}/invoice`}
-            target="_blank"
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-            rel="noreferrer"
-          >
-            Télécharger la facture
-          </a>
+          {quote.invoice ? (
+            <a
+              href={`/api/quotes/${id}/invoice`}
+              target="_blank"
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+              rel="noreferrer"
+            >
+              Télécharger la facture ({quote.invoice.invoiceNumber})
+            </a>
+          ) : (
+            <Link
+              href={`/invoices/new`}
+              className="rounded-md border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800 hover:bg-emerald-100"
+            >
+              Créer la facture
+            </Link>
+          )}
           <Link
             href="/quotes"
             className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
