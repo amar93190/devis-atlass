@@ -5,6 +5,7 @@ const links = [
   { href: "/clients", label: "Clients" },
   { href: "/quotes", label: "Devis" },
   { href: "/invoices", label: "Factures" },
+  { href: "/deposit-request", label: "Demande d'acompte" },
   { href: "/campaigns", label: "Campagnes email" },
 ];
 
