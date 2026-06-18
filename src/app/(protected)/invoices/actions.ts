@@ -6,7 +6,7 @@ import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const INVOICE_PREFIX = "FA";
-const INVOICE_START_NUMBER = 1;
+const INVOICE_START_NUMBER = 22222;
 
 function buildInvoiceNumber(existing: string[]): string {
   const max = existing.reduce((acc, n) => {
