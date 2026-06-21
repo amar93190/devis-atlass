@@ -33,7 +33,7 @@ export default async function DashboardPage() {
         <h2 className="text-xl font-semibold text-slate-900">Dashboard</h2>
         <Link
           href="/quotes/new"
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700"
+          className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
         >
           Nouveau devis
         </Link>

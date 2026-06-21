@@ -37,7 +37,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
 
   const tabClass = (active: boolean) =>
     active
-      ? "rounded-md bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white"
+      ? "rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white"
       : "rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100";
 
   return (
@@ -48,7 +48,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
           <Link href="/clients/import" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
             Importer Excel
           </Link>
-          <Link href="/clients/new" className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">
+          <Link href="/clients/new" className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
             Nouveau client
           </Link>
         </div>

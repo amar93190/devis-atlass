@@ -21,7 +21,7 @@ export default async function CampaignsPage() {
         <h2 className="text-xl font-semibold text-slate-900">Campagnes email</h2>
         <Link
           href="/campaigns/new"
-          className="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-700"
+          className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700"
         >
           Nouvelle campagne
         </Link>

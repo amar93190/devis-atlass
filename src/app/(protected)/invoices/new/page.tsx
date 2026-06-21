@@ -61,7 +61,7 @@ export default async function NewInvoicePage() {
                         <input type="hidden" name="quoteId" value={quote.id} />
                         <button
                           type="submit"
-                          className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
+                          className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
                         >
                           Créer la facture
                         </button>

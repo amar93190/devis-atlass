@@ -61,7 +61,7 @@ export default async function ImportClientsPage({ searchParams }: ImportPageProp
         <div className="flex justify-end">
           <button
             type="submit"
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700"
+            className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
           >
             Importer
           </button>
