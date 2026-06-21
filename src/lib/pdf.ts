@@ -346,17 +346,15 @@ function buildHtml(quote: PdfQuote, mode: "quote" | "invoice" = "quote") {
         <div class="quote-meta-box">
           <div class="title">${isInvoice ? "Informations facture" : "Informations devis"}</div>
           ${isInvoice ? `
-          <div class="quote-meta-grid" style="grid-template-columns: 1fr 1fr 1fr 1.4fr 1fr;">
+          <div class="quote-meta-grid" style="grid-template-columns: 1fr 1fr 1fr 1.4fr;">
             <div class="quote-meta-cell quote-meta-label">N° facture</div>
             <div class="quote-meta-cell quote-meta-label">Réf. devis</div>
             <div class="quote-meta-cell quote-meta-label">Date</div>
             <div class="quote-meta-cell quote-meta-label">Mode de règlement</div>
-            <div class="quote-meta-cell quote-meta-label">Référence</div>
             <div class="quote-meta-cell quote-meta-value">${escapeHtml(quote.invoiceNumber ?? "")}</div>
             <div class="quote-meta-cell quote-meta-value">${escapeHtml(quote.quoteNumber)}</div>
             <div class="quote-meta-cell quote-meta-value">${formatDate(quote.date)}</div>
             <div class="quote-meta-cell quote-meta-value">${escapeHtml(paymentMethod)}</div>
-            <div class="quote-meta-cell quote-meta-value">${escapeHtml(quote.reference)}</div>
           </div>
           ` : `
           <div class="quote-meta-grid">
