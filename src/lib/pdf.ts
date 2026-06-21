@@ -447,6 +447,131 @@ export async function generateQuotePdf(quote: PdfQuote): Promise<Buffer> {
   return renderPdf(buildHtml(quote, "quote"));
 }
 
+type PdfDepositRequest = {
+  number: string;
+  date: Date;
+  paymentMethod: string;
+  description: string;
+  amountHT: number;
+  client: {
+    companyName: string;
+    address: string;
+  };
+};
+
+export async function generateDepositRequestPdf(data: PdfDepositRequest): Promise<Buffer> {
+  const logoMarkup = logoDataUri
+    ? `<img src="${logoDataUri}" alt="Atlas Sign" style="width:70px;height:auto;display:block;" />`
+    : `<div style="font-size:16px;font-weight:700;">ATLAS SIGN</div>`;
+
+  const clientAddress = splitClientAddress(data.client.address);
+  const totalTVA = toMoney(data.amountHT * VAT_RATE);
+  const totalTTC = toMoney(data.amountHT + totalTVA);
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #111827; margin: 24px; padding-bottom: 48px; }
+    .header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+    .tagline { font-size: 22px; font-weight: 800; color: #111827; line-height: 1.2; }
+    .tagline span { color: #dc2626; }
+    .top-section { display: flex; justify-content: space-between; margin-bottom: 24px; }
+    .info-box { border: 1px solid #cfd6df; width: 55%; }
+    .info-box table { width: 100%; border-collapse: collapse; }
+    .info-box td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+    .info-box td:first-child { font-weight: 700; white-space: nowrap; width: 45%; background: #f8fafc; }
+    .info-box tr:last-child td { border-bottom: none; }
+    .title-cell { font-size: 18px; font-style: italic; font-weight: 800; }
+    .client-block { text-align: right; font-size: 12px; line-height: 1.6; }
+    .client-block p { margin: 0; }
+    table.main { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    table.main th { background: #f3f4f6; border: 1px solid #cfd6df; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+    table.main th.right, table.main td.right { text-align: right; }
+    table.main td { border: 1px solid #cfd6df; padding: 10px; vertical-align: top; }
+    .legal { margin-top: 20px; font-size: 9px; color: #6b7280; line-height: 1.5; }
+    .bottom-section { display: flex; gap: 24px; margin-top: 20px; }
+    .tva-table { border-collapse: collapse; flex: 1; }
+    .tva-table th, .tva-table td { border: 1px solid #cfd6df; padding: 6px 10px; text-align: right; font-size: 11px; }
+    .tva-table th { background: #f3f4f6; text-align: center; font-size: 10px; text-transform: uppercase; }
+    .totals { border-collapse: collapse; flex: 1; }
+    .totals td { border: 1px solid #cfd6df; padding: 6px 10px; font-size: 12px; }
+    .totals td:last-child { text-align: right; font-weight: 600; }
+    .footer { position: fixed; left: 16px; right: 16px; bottom: 16px; border-top: 1px solid #e5e7eb; padding-top: 6px; font-size: 9px; color: #6b7280; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    ${logoMarkup}
+    <div class="tagline">Exclusivement pour les <span>Enseignistes</span></div>
+  </div>
+
+  <div class="top-section">
+    <div class="info-box">
+      <table>
+        <tr>
+          <td class="title-cell" colspan="2"><em>Facture d&apos;acompte</em></td>
+          <td style="font-weight:700;font-size:11px;text-align:right;background:#f8fafc;">Numéro<br/><span style="font-weight:400;font-size:12px;">${escapeHtml(data.number)}</span></td>
+        </tr>
+        <tr><td>Date :</td><td colspan="2">${formatDate(data.date)}</td></tr>
+        <tr><td>Mode de règlement :</td><td colspan="2">${escapeHtml(data.paymentMethod)}</td></tr>
+        <tr><td>N° de TVA Intracom :</td><td colspan="2">FR18852424944</td></tr>
+      </table>
+    </div>
+    <div class="client-block">
+      <p><strong>${escapeHtml(data.client.companyName)}</strong></p>
+      ${clientAddress.line2 ? `<p>${escapeHtml(clientAddress.line2)}</p>` : ""}
+      ${clientAddress.line3 ? `<p>${escapeHtml(clientAddress.line3)}</p>` : ""}
+    </div>
+  </div>
+
+  <table class="main">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th class="right" style="width:130px;">Montant HT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="height:180px;vertical-align:top;">${escapeHtml(data.description)}</td>
+        <td class="right" style="vertical-align:top;">${formatCurrency(data.amountHT)}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="legal">
+    Escompte pour règlement anticipé : 0%<br/>
+    En cas de retard de paiement, une pénalité égale à 3 fois le taux d&apos;intérêt légal sera exigible (Décret 2009-138 du 9 février 2009).<br/>
+    Pour les professionnels, une indemnité minimum forfaitaire de 40 euros pour frais de recouvrement sera exigible (Décret 2012-1115 du 9 octobre 2012).
+  </div>
+
+  <div class="bottom-section">
+    <table class="tva-table">
+      <thead><tr><th>Taux</th><th>Base HT</th><th>Montant TVA</th></tr></thead>
+      <tbody><tr><td>20,00</td><td>${formatCurrency(data.amountHT)}</td><td>${formatCurrency(totalTVA)}</td></tr></tbody>
+    </table>
+    <table class="totals">
+      <tbody>
+        <tr><td>Total HT</td><td>${formatCurrency(data.amountHT)}</td></tr>
+        <tr><td>Total TVA</td><td>${formatCurrency(totalTVA)}</td></tr>
+        <tr><td style="font-weight:700;">Total TTC</td><td>${formatCurrency(totalTTC)}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    Siret : 85242494400019 - RCS : IBAN FR46 3000 2011 3600 0007 1490 B34 - N° TVA intracom : FR18852424944
+  </div>
+
+</body>
+</html>`;
+
+  return renderPdf(html);
+}
+
 export async function generateInvoicePdf(quote: PdfQuote): Promise<Buffer> {
   return renderPdf(buildHtml(quote, "invoice"));
 }

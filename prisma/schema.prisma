@@ -27,10 +27,11 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  quotes     Quote[]
-  sessions   Session[]
-  campaigns  Campaign[]
-  invoices   Invoice[]
+  quotes           Quote[]
+  sessions         Session[]
+  campaigns        Campaign[]
+  invoices         Invoice[]
+  depositRequests  DepositRequest[]
 }
 
 model Session {
@@ -84,8 +85,9 @@ model Quote {
 
   client    Client     @relation(fields: [clientId], references: [id], onDelete: Restrict)
   createdBy User       @relation(fields: [createdById], references: [id], onDelete: Restrict)
-  items     QuoteItem[]
-  invoice   Invoice?
+  items           QuoteItem[]
+  invoice         Invoice?
+  depositRequests DepositRequest[]
 
   @@index([clientId])
   @@index([createdById])
@@ -122,6 +124,23 @@ model CampaignRecipient {
 
   @@index([campaignId])
   @@index([clientId])
+}
+
+model DepositRequest {
+  id            String   @id @default(cuid())
+  number        String   @unique
+  quoteId       String
+  description   String
+  amountHT      Decimal  @db.Decimal(12, 2)
+  paymentMethod String   @default("Virement SEPA")
+  createdById   String
+  createdAt     DateTime @default(now())
+
+  quote     Quote @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  createdBy User  @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([createdById])
+  @@index([quoteId])
 }
 
 model Invoice {
