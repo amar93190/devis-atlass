@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const links = [
   {
@@ -79,6 +80,7 @@ type AppShellProps = {
 
 export function AppShell({ userName, children }: AppShellProps) {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -100,13 +102,13 @@ export function AppShell({ userName, children }: AppShellProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5">
+            <div className="hidden sm:flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5">
               <div className="h-6 w-6 rounded-full bg-red-600 flex items-center justify-center text-xs font-bold text-white">
                 {userName.charAt(0).toUpperCase()}
               </div>
               <span className="text-sm font-medium text-slate-700">{userName}</span>
             </div>
-            <form action="/api/auth/logout" method="post">
+            <form action="/api/auth/logout" method="post" className="hidden sm:block">
               <button
                 type="submit"
                 className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
@@ -114,9 +116,54 @@ export function AppShell({ userName, children }: AppShellProps) {
                 Déconnexion
               </button>
             </form>
+            {/* Hamburger mobile */}
+            <button
+              type="button"
+              onClick={() => setMobileOpen((v) => !v)}
+              className="md:hidden rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-100"
+            >
+              {mobileOpen ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+              )}
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Mobile nav */}
+      {mobileOpen && (
+        <div className="md:hidden border-b border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <nav className="space-y-1">
+            {links.map((link) => {
+              const isActive = pathname === link.href || pathname.startsWith(link.href + "/");
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                    isActive ? "bg-red-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  <span className={isActive ? "text-white" : "text-slate-400"}>{link.icon}</span>
+                  {link.label}
+                </Link>
+              );
+            })}
+            <form action="/api/auth/logout" method="post" className="pt-2 border-t border-slate-200 mt-2">
+              <button type="submit" className="w-full text-left px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">
+                Déconnexion
+              </button>
+            </form>
+          </nav>
+        </div>
+      )}
 
       <div className="mx-auto flex w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:px-8">
         {/* Sidebar */}

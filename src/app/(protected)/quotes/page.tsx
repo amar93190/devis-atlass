@@ -51,6 +51,9 @@ export default async function QuotesPage({ searchParams }: QuotesPageProps) {
       </form>
 
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+          <span className="text-xs text-slate-500">{quotes.length} devis</span>
+        </header>
         <table className="w-full min-w-[900px] text-sm">
           <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
             <tr>
@@ -65,9 +68,9 @@ export default async function QuotesPage({ searchParams }: QuotesPageProps) {
           </thead>
           <tbody>
             {quotes.map((quote) => (
-              <tr key={quote.id} className="border-t border-slate-200">
+              <tr key={quote.id} className="border-t border-slate-200 transition-colors hover:bg-red-50">
                 <td className="px-4 py-3 font-medium text-slate-900">
-                  <Link href={`/quotes/${quote.id}`} className="hover:underline">
+                  <Link href={`/quotes/${quote.id}`} className="hover:text-red-600">
                     {quote.quoteNumber}
                   </Link>
                 </td>

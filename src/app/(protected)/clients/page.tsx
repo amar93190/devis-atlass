@@ -115,7 +115,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
               </tr>
             ) : (
               clients.map((client) => (
-                <tr key={client.id} className="border-t border-slate-200 cursor-pointer hover:bg-slate-50">
+                <tr key={client.id} className="border-t border-slate-200 cursor-pointer transition-colors hover:bg-red-50">
                   <td className="px-4 py-3 font-medium text-slate-900">
                     <Link href={`/clients/${client.id}/edit`} className="block w-full">{client.companyName}</Link>
                   </td>

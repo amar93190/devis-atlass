@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Devis Express",
+  title: "Atlas Sign — Outil interne",
   description: "Application interne de génération de devis",
+  icons: { icon: "/logo-atlas-sign.jpg" },
 };
 
 export default function RootLayout({

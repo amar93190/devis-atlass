@@ -62,7 +62,7 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
                 const totalHT = Number(invoice.quote.totalHT);
                 const totalTTC = toMoney(totalHT + toMoney(totalHT * VAT_RATE));
                 return (
-                  <tr key={invoice.id} className="border-t border-slate-200">
+                  <tr key={invoice.id} className="border-t border-slate-200 transition-colors hover:bg-red-50">
                     <td className="px-4 py-3 font-medium text-slate-900">
                       {invoice.invoiceNumber}
                     </td>
